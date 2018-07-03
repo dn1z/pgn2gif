@@ -60,7 +60,8 @@ def update(move : str , turn : int):
             frm = source_of_move(move , turn)
 
             clear(frm)
-            clear(to)  
+            if pieces[move[-2:]] != '':
+                clear(to)  
 
             if move[0] in ('N' , 'K' , 'Q' , 'R' , 'B'):
                 exec('board.paste(w{0},to,w{0}) if turn == 0 else board.paste(b{0},to,b{0})'.format(move[0].lower()))
