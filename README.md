@@ -11,4 +11,4 @@ It automatically detects pgn files in script path
 ```
 
 ## GIF output
-![alt text](https://github.com/dn1z/pgn2gif/tree/master/gifs/sample.gif)
+<img src="https://media.giphy.com/media/2UtkKmkhBCfv0bXHBk/giphy.gif">
