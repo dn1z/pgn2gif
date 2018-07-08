@@ -3,8 +3,8 @@ Generate gifs from your chess games.
 
 # How to use
 You need [python 3.6](https://www.python.org/downloads/) or newer installed.   
-Download or clone repo.  
-Open up command prompt,change direction to your exctracted folder and type the command below.  
+Download and extrack repo.  
+Open up command prompt,change directory to your extracted folder and type the command below.  
 ```
 pip install -r requirements.txt
 ```
