@@ -9,21 +9,22 @@ rows = ['1', '2', '3', '4', '5', '6', '7', '8']
 
 black_square = img.new('RGBA', (80, 80), (75, 115, 153))
 white_square = img.new('RGBA', (80, 80), (234, 233, 210))
-board = img.open('images/board.png')
 
-bk = img.open('images/bk.png')
-bq = img.open('images/bq.png')
-bb = img.open('images/bb.png')
-bn = img.open('images/bn.png')
-br = img.open('images/br.png')
-bp = img.open('images/bp.png')
+board = img.open("./images/board.png")
 
-wk = img.open('images/wk.png')
-wq = img.open('images/wq.png')
-wb = img.open('images/wb.png')
-wn = img.open('images/wn.png')
-wr = img.open('images/wr.png')
-wp = img.open('images/wp.png')
+bk = img.open('./images/bk.png')
+bq = img.open('./images/bq.png')
+bb = img.open('./images/bb.png')
+bn = img.open('./images/bn.png')
+br = img.open('./images/br.png')
+bp = img.open('./images/bp.png')
+
+wk = img.open('./images/wk.png')
+wq = img.open('./images/wq.png')
+wb = img.open('./images/wb.png')
+wn = img.open('./images/wn.png')
+wr = img.open('./images/wr.png')
+wp = img.open('./images/wp.png')
 
 
 def get_moves(file_path: str) -> list:
