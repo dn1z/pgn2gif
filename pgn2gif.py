@@ -1,7 +1,8 @@
-import re
-import glob
-
 import argparse
+import glob
+import os
+import re
+
 import imageio
 import numpy as np
 from PIL import Image as img
@@ -12,7 +13,7 @@ rows = ['1', '2', '3', '4', '5', '6', '7', '8']
 black_square = img.new('RGBA', (80, 80), (75, 115, 153))
 white_square = img.new('RGBA', (80, 80), (234, 233, 210))
 
-board = img.open("./images/board.png")
+board = img.open('./images/board.png')
 
 bk = img.open('./images/bk.png')
 bq = img.open('./images/bq.png')
@@ -272,13 +273,13 @@ def create_gif(file_name: str, out_name: str, duration: float, output_dir: str):
     imageio.mimsave(f'{output_dir}/{out_name}', images, duration=duration)
 
 
-def creategif_file(pgn: str, duration: float, output_dir: str):
+def create_gif_file(pgn: str, duration: float, output_dir: str):
     """
     Act as a calling function for the create_gif.
     Handles one pgn file at a time.
 
     :pgn: Name of the pgn file
-    :duration: Speed of the peices moving in a gif
+    :duration: Speed of the pieces moving in a gif
     """
     basename = os.path.basename(pgn)
     name = basename[:-4] + '.gif'
