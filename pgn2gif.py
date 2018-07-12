@@ -301,8 +301,8 @@ if __name__ == '__main__':
 
     print('pgn2gif')
     if os.path.isfile(args.path):
-        creategif_file(args.path, args.speed, args.out)
+        create_gif_file(args.path, args.speed, args.out)
 
     elif os.path.isdir(args.path):
         for pgn in glob.glob(args.path + '*.pgn'):
-            creategif_file(pgn, args.speed, args.out)
+            create_gif_file(pgn, args.speed, args.out)
