@@ -1,5 +1,7 @@
 import re
+import glob
 
+import argparse
 import imageio
 import numpy as np
 from PIL import Image as img
@@ -248,7 +250,7 @@ def source_of_move(move: str, turn: int) -> tuple:
     return pixels_from_square(source)
 
 
-def create_gif(file_name: str, out_name: str, duration: float = 0.5):
+def create_gif(file_name: str, out_name: str, duration: float, output_dir: str):
     global pieces
     pieces = {'a8': 'br', 'b8': 'bn', 'c8': 'bb', 'd8': 'bq', 'e8': 'bk', 'f8': 'bb', 'g8': 'bn', 'h8': 'br',
               'a7': 'bp', 'b7': 'bp', 'c7': 'bp', 'd7': 'bp', 'e7': 'bp', 'f7': 'bp', 'g7': 'bp', 'h7': 'bp',
@@ -267,19 +269,39 @@ def create_gif(file_name: str, out_name: str, duration: float = 0.5):
         images.append(np.array(board))
     images.append(np.array(board))
 
-    imageio.mimsave(f'gifs/{out_name}', images, duration=duration)
+    imageio.mimsave(f'{output_dir}/{out_name}', images, duration=duration)
+
+
+def creategif_file(pgn: str, duration: float, output_dir: str):
+    """
+    Act as a calling function for the create_gif.
+    Handles one pgn file at a time.
+
+    :pgn: Name of the pgn file
+    :duration: Speed of the peices moving in a gif
+    """
+    basename = os.path.basename(pgn)
+    name = basename[:-4] + '.gif'
+    if name in os.listdir('gifs/'):
+        print("gif with name %s already exists." % name)
+    else:
+        print('Creating ' + name + '....')
+        create_gif(pgn, name, duration, output_dir)
+        print("done")
 
 
 if __name__ == '__main__':
-    import glob
-    import os
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', '--path', help='path to the pgn file/folder', default=os.getcwd() + '/')
+    parser.add_argument('-s', '--speed', help='Speed with which pieces move in gif.', default=0.5)
+    parser.add_argument('-o', '--out', help='Name of the output folder', default=os.getcwd() + '/gifs')
+    args = parser.parse_args()
 
     print('pgn2gif')
-    for pgn in glob.glob('*.pgn'):
-        name = os.path.basename(pgn)[:-4] + '.gif'
-        if name in os.listdir('gifs/'):
-            continue
-        else:
-            print('Creating ' + name + '...')
-            create_gif(pgn, name)
-            print('Done ')
+    if os.path.isfile(args.path):
+        creategif_file(args.path, args.speed, args.out)
+
+    elif os.path.isdir(args.path):
+        for pgn in glob.glob(args.path + '*.pgn'):
+            creategif_file(pgn, args.speed, args.out)
