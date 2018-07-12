@@ -1,5 +1,5 @@
 # pgn2gif
-Generate gifs from pgn files of you're chess games.
+Generate gifs from pgn files of your chess games.
 
 ## Installation
 * You need [python 3.6](https://www.python.org/downloads/) or newer installed.
