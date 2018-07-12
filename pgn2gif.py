@@ -1,32 +1,29 @@
-import os
 import re
 
 import imageio
 import numpy as np
 from PIL import Image as img
 
-path = os.path.dirname(__file__)
-
 columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 rows = ['1', '2', '3', '4', '5', '6', '7', '8']
 
 black_square = img.new('RGBA', (80, 80), (75, 115, 153))
 white_square = img.new('RGBA', (80, 80), (234, 233, 210))
-board = img.open(path + "/images/board.png")
+board = img.open('images/board.png')
 
-bk = img.open(path + '/images/bk.png')
-bq = img.open(path + '/images/bq.png')
-bb = img.open(path + '/images/bb.png')
-bn = img.open(path + '/images/bn.png')
-br = img.open(path + '/images/br.png')
-bp = img.open(path + '/images/bp.png')
+bk = img.open('images/bk.png')
+bq = img.open('images/bq.png')
+bb = img.open('images/bb.png')
+bn = img.open('images/bn.png')
+br = img.open('images/br.png')
+bp = img.open('images/bp.png')
 
-wk = img.open(path + '/images/wk.png')
-wq = img.open(path + '/images/wq.png')
-wb = img.open(path + '/images/wb.png')
-wn = img.open(path + '/images/wn.png')
-wr = img.open(path + '/images/wr.png')
-wp = img.open(path + '/images/wp.png')
+wk = img.open('images/wk.png')
+wq = img.open('images/wq.png')
+wb = img.open('images/wb.png')
+wn = img.open('images/wn.png')
+wr = img.open('images/wr.png')
+wp = img.open('images/wp.png')
 
 
 def get_moves(file_path: str) -> list:
@@ -274,6 +271,7 @@ def create_gif(file_name: str, out_name: str, duration: float = 0.5):
 
 if __name__ == '__main__':
     import glob
+    import os
 
     print('pgn2gif')
     for pgn in glob.glob('*.pgn'):
