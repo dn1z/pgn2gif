@@ -13,8 +13,6 @@ rows = ['1', '2', '3', '4', '5', '6', '7', '8']
 black_square = img.new('RGBA', (80, 80), (75, 115, 153))
 white_square = img.new('RGBA', (80, 80), (234, 233, 210))
 
-board = img.open('./images/board.png')
-
 bk = img.open('./images/bk.png')
 bq = img.open('./images/bq.png')
 bb = img.open('./images/bb.png')
@@ -98,7 +96,7 @@ def update(move: str, turn: int):
             k = 'bk'
             r = 'br'
             row = '8'
-        kl = 'e' + row
+        current = 'e' + row
         if move.count('O') == 2:
             ks = 'g' + row
             rs = 'f' + row
@@ -110,8 +108,8 @@ def update(move: str, turn: int):
             clear(pixels_from_square('a' + row))
             update_pieces('a' + row, rs, r)
 
-        update_pieces(kl, ks, k)
-        clear(pixels_from_square(kl))
+        update_pieces(current, ks, k)
+        clear(pixels_from_square(current))
         exec(f'board.paste({k},{pixels_from_square(ks)},{k})')
         exec(f'board.paste({r},{pixels_from_square(rs)},{r})')
 
@@ -252,6 +250,9 @@ def source_of_move(move: str, turn: int) -> tuple:
 
 
 def create_gif(file_name: str, out_name: str, duration: float, output_dir: str):
+    global board
+    board = img.open('./images/board.png')
+    
     global pieces
     pieces = {'a8': 'br', 'b8': 'bn', 'c8': 'bb', 'd8': 'bq', 'e8': 'bk', 'f8': 'bb', 'g8': 'bn', 'h8': 'br',
               'a7': 'bp', 'b7': 'bp', 'c7': 'bp', 'd7': 'bp', 'e7': 'bp', 'f7': 'bp', 'g7': 'bp', 'h7': 'bp',
