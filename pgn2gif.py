@@ -10,8 +10,8 @@ from PIL import Image as img
 columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 rows = ['1', '2', '3', '4', '5', '6', '7', '8']
 
-black_square = img.new('RGBA', (80, 80), (75, 115, 153))
-white_square = img.new('RGBA', (80, 80), (234, 233, 210))
+black_square = img.new('RGBA', (60, 60), (75, 115, 153))
+white_square = img.new('RGBA', (60, 60), (234, 233, 210))
 
 bk = img.open('./images/bk.png')
 bq = img.open('./images/bq.png')
@@ -26,7 +26,6 @@ wb = img.open('./images/wb.png')
 wn = img.open('./images/wn.png')
 wr = img.open('./images/wr.png')
 wp = img.open('./images/wp.png')
-
 
 def get_moves(file_path: str) -> list:
     pgn = open(file_path)
@@ -47,11 +46,14 @@ def pixels_from_square(move: str) -> tuple:
     m = move[-2:]
     i1 = columns.index(m[0])
     i2 = 7 - rows.index(m[1])
-    return (i1 * 80, i2 * 80)
+    if is_reversed:
+        return ((7 - i1) * 60, (7 - i2) * 60)
+    else:
+        return (i1 * 60, i2 * 60)
 
 
 def clear(crd: tuple):
-    if (crd[0] + crd[1]) % 160 == 0:
+    if (crd[0] + crd[1]) % 120 == 0:
         board.paste(white_square, crd, white_square)
     else:
         board.paste(black_square, crd, black_square)
@@ -151,7 +153,8 @@ def check_diagonal(sqr1: str, sqr2: str) -> bool:
         elif c1 > c2 and r2 > r1:
             return all(pieces[columns[c2 + i] + str(r2 - i)] == '' for i in range(1, c1 - c2))
 
-        return all(pieces[columns[c2 - i] + str(r2 + i)] == '' for i in range(1, c2 - c1))
+        else:
+            return all(pieces[columns[c2 - i] + str(r2 + i)] == '' for i in range(1, c2 - c1))
     return False
 
 
@@ -249,9 +252,15 @@ def source_of_move(move: str, turn: int) -> tuple:
     return pixels_from_square(source)
 
 
-def create_gif(file_name: str, out_name: str, duration: float, output_dir: str):
+def create_gif(file_name: str, out_name: str, duration: float, output_dir: str, reverse: bool):
+    global is_reversed
+    is_reversed = reverse 
+
     global board
-    board = img.open('./images/board.png')
+    if is_reversed:
+        board = img.open('./images/board2.png')
+    else:
+        board = img.open('./images/board.png')
     
     global pieces
     pieces = {'a8': 'br', 'b8': 'bn', 'c8': 'bb', 'd8': 'bq', 'e8': 'bk', 'f8': 'bb', 'g8': 'bn', 'h8': 'br',
@@ -269,12 +278,14 @@ def create_gif(file_name: str, out_name: str, duration: float, output_dir: str):
     for i in range(len(moves)):
         update(moves[i], i % 2)
         images.append(np.array(board))
-    images.append(np.array(board))
+
+    for i in range(3):
+        images.append(np.array(board))
 
     imageio.mimsave(f'{output_dir}/{out_name}', images, duration=duration)
 
 
-def create_gif_file(pgn: str, duration: float, output_dir: str):
+def create_gif_file(pgn: str, duration: float, output_dir: str,reverse: bool):
     """
     Act as a calling function for the create_gif.
     Handles one pgn file at a time.
@@ -288,7 +299,7 @@ def create_gif_file(pgn: str, duration: float, output_dir: str):
         print("gif with name %s already exists." % name)
     else:
         print('Creating ' + name + '....')
-        create_gif(pgn, name, duration, output_dir)
+        create_gif(pgn, name, duration, output_dir, reverse)
         print("done")
 
 
@@ -298,12 +309,13 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--path', help='path to the pgn file/folder', default=os.getcwd() + '/')
     parser.add_argument('-s', '--speed', help='Speed with which pieces move in gif.', default=0.5)
     parser.add_argument('-o', '--out', help='Name of the output folder', default=os.getcwd() + '/gifs')
+    parser.add_argument('-r', '--reverse', help='Whether reverse board or not', default=False)
     args = parser.parse_args()
 
     print('pgn2gif')
     if os.path.isfile(args.path):
-        create_gif_file(args.path, args.speed, args.out)
+        create_gif_file(args.path, args.speed, args.out, args.reverse)
 
     elif os.path.isdir(args.path):
         for pgn in glob.glob(args.path + '*.pgn'):
-            create_gif_file(pgn, args.speed, args.out)
+            create_gif_file(pgn, args.speed, args.out, args.reverse)

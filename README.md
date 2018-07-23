@@ -13,12 +13,13 @@ pip install -r requirements.txt
 Run `python3.6 pgn2gif.py` with the following options:
 ```
 Usage
-    pgn2gif.py [-p | -s | -o]
+    pgn2gif.py [-p | -s | -o | -r]
 
 Options:
     -p, --path          Path to the pgn file/folder
     -s, --speed         Speed of the pieces moving in gif
     -o, --out           Path to the gif output directory
+    -r, --reverse       Whether reverse board or not
 ```
 
 __NOTE__
