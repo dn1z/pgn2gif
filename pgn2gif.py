@@ -27,43 +27,34 @@ wn = img.open('./images/wn.png')
 wr = img.open('./images/wr.png')
 wp = img.open('./images/wp.png')
 
-def get_moves(file_path: str) -> list:
-    pgn = open(file_path)
-    move_lines = [line for line in pgn.readlines() if not line[0] == "[" and not line[0] == "\n"]
-    pgn.close()
-
-    moves = []
-    for move_line in move_lines:
-        for move in re.split(r'\d+\.', move_line):
-            moves.extend(move.split(' '))
-
-    results = ('0-1\n', '1-0\n', '1/2-1/2\n')
-    return [move.rstrip().strip('+').strip('#').replace('x', '')
-            for move in moves if len(move) >= 2 and move not in results]
+def getMovesFromPgn(file_path: str) -> list:
+    with open(file_path) as pgn:
+        data = pgn.read()        
+        moves = re.findall(r'[a-h]x?[a-h]?\d=?[A-Z]?|O-O-?O?|[BKNRQ][a-h1-8]?[a-h1-8]?x?[a-h]\d',data)
+        return [move.replace('x','') for move in moves]
 
 
-def pixels_from_square(move: str) -> tuple:
-    m = move[-2:]
-    i1 = columns.index(m[0])
-    i2 = 7 - rows.index(m[1])
-    if is_reversed:
-        return ((7 - i1) * 60, (7 - i2) * 60)
+def pointOfSquare(move: str) -> tuple:
+    c = columns.index(move[-2])
+    r = 7 - rows.index(move[-1])
+    if isReversed:
+        return ((7 - c) * 60, (7 - r) * 60)
     else:
-        return (i1 * 60, i2 * 60)
+        return (c * 60, r * 60)
 
 
-def clear(crd: tuple):
-    if (crd[0] + crd[1]) % 120 == 0:
-        board.paste(white_square, crd, white_square)
+def clear(point: tuple):
+    if (point[0] + point[1]) % 120 == 0:
+        board.paste(white_square, point, white_square)
     else:
-        board.paste(black_square, crd, black_square)
+        board.paste(black_square, point, black_square)
 
 
 def update(move: str, turn: int):
     if not 'O' in move:
         if not '=' in move:
-            to = pixels_from_square(move)
-            frm = source_of_move(move, turn)
+            to = pointOfSquare(move)
+            frm = pointOfSource(move, turn)
 
             clear(frm)
             if pieces[move[-2:]] != '':
@@ -83,12 +74,12 @@ def update(move: str, turn: int):
             else:
                 frm = move[0] + str(int(move[-3]) + 1)
 
-            update_pieces(frm, to, p)
-            clear(pixels_from_square(frm))
-            # Promotion with capture e.g. bc3=Q
+            updatePieces(frm, to, p)
+            clear(pointOfSquare(frm))
+            # Promotion with capture e.g. bc1=Q
             if len(move) == 5:
-                clear(pixels_from_square(to))
-            exec(f'board.paste({p},{pixels_from_square(to)},{p})')
+                clear(pointOfSquare(to))
+            exec(f'board.paste({p},{pointOfSquare(to)},{p})')
     else:
         if turn == 0:
             k = 'wk'
@@ -102,30 +93,30 @@ def update(move: str, turn: int):
         if move.count('O') == 2:
             ks = 'g' + row
             rs = 'f' + row
-            clear(pixels_from_square('h' + row))
-            update_pieces('h' + row, rs, r)
+            clear(pointOfSquare('h' + row))
+            updatePieces('h' + row, rs, r)
         else:
             ks = 'c' + row
             rs = 'd' + row
-            clear(pixels_from_square('a' + row))
-            update_pieces('a' + row, rs, r)
+            clear(pointOfSquare('a' + row))
+            updatePieces('a' + row, rs, r)
 
-        update_pieces(current, ks, k)
-        clear(pixels_from_square(current))
-        exec(f'board.paste({k},{pixels_from_square(ks)},{k})')
-        exec(f'board.paste({r},{pixels_from_square(rs)},{r})')
+        updatePieces(current, ks, k)
+        clear(pointOfSquare(current))
+        exec(f'board.paste({k},{pointOfSquare(ks)},{k})')
+        exec(f'board.paste({r},{pointOfSquare(rs)},{r})')
 
 
-def check_knight_move(crd1: str, crd2: str) -> bool:
-    v = abs(columns.index(crd1[0]) - columns.index(crd2[0]))
+def checkKnightMove(sqr1: str, sqr2: str) -> bool:
+    v = abs(columns.index(sqr1[0]) - columns.index(sqr2[0]))
     if v == 1:
-        return abs(rows.index(crd1[1]) - rows.index(crd2[1])) == 2
+        return abs(rows.index(sqr1[1]) - rows.index(sqr2[1])) == 2
     elif v == 2:
-        return abs(rows.index(crd1[1]) - rows.index(crd2[1])) == 1
+        return abs(rows.index(sqr1[1]) - rows.index(sqr2[1])) == 1
     return False
 
 
-def check_line(sqr1: str, sqr2: str) -> bool:
+def checkLine(sqr1: str, sqr2: str) -> bool:
     c1 = sqr1[0]
     c2 = sqr2[0]
     r1 = int(sqr1[1])
@@ -139,7 +130,7 @@ def check_line(sqr1: str, sqr2: str) -> bool:
     return False
 
 
-def check_diagonal(sqr1: str, sqr2: str) -> bool:
+def checkDiagonal(sqr1: str, sqr2: str) -> bool:
     c1 = columns.index(sqr1[0])
     c2 = columns.index(sqr2[0])
     r1 = int(sqr1[1])
@@ -158,12 +149,12 @@ def check_diagonal(sqr1: str, sqr2: str) -> bool:
     return False
 
 
-def update_pieces(frm: str, to: str, piece_type: str):
+def updatePieces(frm: str, to: str, piece_type: str):
     pieces[frm] = ''
     pieces[to] = piece_type
 
 
-def source_of_move(move: str, turn: int) -> tuple:
+def pointOfSource(move: str, turn: int) -> tuple:
     # Presents which square move has played
     to = move[-2:]
     # Presents which square move came from
@@ -199,7 +190,7 @@ def source_of_move(move: str, turn: int) -> tuple:
                     next_pawn = c + str(r - 1)
                 else:
                     next_pawn = c + str(r + 1)
-                clear(pixels_from_square(next_pawn))
+                clear(pointOfSquare(next_pawn))
                 pieces[next_pawn] = ''
                 source = move[0] + next_pawn[-1]
 
@@ -210,20 +201,20 @@ def source_of_move(move: str, turn: int) -> tuple:
     elif move[0] == 'B':
         p = 'wb' if turn == 0 else 'bb'
         if len(move) == 3:
-            source = next(sq for sq, pt in pieces.items() if pt == p and check_diagonal(sq, to))
+            source = next(sq for sq, pt in pieces.items() if pt == p and checkDiagonal(sq, to))
         else:
             indicator = move[1]
-            source = next(sq for sq, pt in pieces.items() if pt == p and indicator in sq and check_diagonal(sq, to))
+            source = next(sq for sq, pt in pieces.items() if pt == p and indicator in sq and checkDiagonal(sq, to))
 
     elif move[0] == 'R':
         p = 'wr' if turn == 0 else 'br'
         # e.g. Ra3
         if len(move) == 3:
             try:
-                source = c + next(row for row in rows if pieces[c + str(row)] == p and check_line(c + str(row), to))
+                source = c + next(row for row in rows if pieces[c + str(row)] == p and checkLine(c + str(row), to))
 
             except:
-                source = next(col for col in columns if pieces[col + str(r)] == p and check_line(col + str(r), to)) + str(r)
+                source = next(col for col in columns if pieces[col + str(r)] == p and checkLine(col + str(r), to)) + str(r)
         # e.g. Raa3
         else:
             indicator = move[1]
@@ -235,7 +226,7 @@ def source_of_move(move: str, turn: int) -> tuple:
     elif move[0] == 'Q':
         p = 'wq' if turn == 0 else 'bq'
         if len(move) == 3:
-            source = next(sq for sq, pt in pieces.items() if pt == p and (check_line(sq, to) or check_diagonal(sq, to)))
+            source = next(sq for sq, pt in pieces.items() if pt == p and (checkLine(sq, to) or checkDiagonal(sq, to)))
         else:
             indicator = move[1]
             source = next(sq for sq, pt in pieces.items() if pt == p and indicator in (move[0], move[1]))
@@ -243,21 +234,21 @@ def source_of_move(move: str, turn: int) -> tuple:
     elif move[0] == 'N':
         p = 'wn' if turn == 0 else 'bn'
         if len(move) == 3:
-            source = next(sq for sq, pt in pieces.items() if pt == p and check_knight_move(sq, to))
+            source = next(sq for sq, pt in pieces.items() if pt == p and checkKnightMove(sq, to))
         else:
             indicator = move[1]
-            source = next(sq for sq, pt in pieces.items() if pt == p and indicator in sq and check_knight_move(sq, to))
+            source = next(sq for sq, pt in pieces.items() if pt == p and indicator in sq and checkKnightMove(sq, to))
 
-    update_pieces(source, to, p)
-    return pixels_from_square(source)
+    updatePieces(source, to, p)
+    return pointOfSquare(source)
 
 
-def create_gif(file_name: str, out_name: str, duration: float, output_dir: str, reverse: bool):
-    global is_reversed
-    is_reversed = reverse 
+def createGif(file_name: str, out_name: str, duration: float, output_dir: str, reverse: bool):
+    global isReversed
+    isReversed = reverse 
 
     global board
-    if is_reversed:
+    if isReversed:
         board = img.open('./images/board2.png')
     else:
         board = img.open('./images/board.png')
@@ -273,7 +264,7 @@ def create_gif(file_name: str, out_name: str, duration: float, output_dir: str, 
               'a1': 'wr', 'b1': 'wn', 'c1': 'wb', 'd1': 'wq', 'e1': 'wk', 'f1': 'wb', 'g1': 'wn', 'h1': 'wr'}
 
     images = [np.array(board)]
-    moves = get_moves(file_name)
+    moves = getMovesFromPgn(file_name)
 
     for i in range(len(moves)):
         update(moves[i], i % 2)
@@ -285,9 +276,9 @@ def create_gif(file_name: str, out_name: str, duration: float, output_dir: str, 
     imageio.mimsave(f'{output_dir}/{out_name}', images, duration=duration)
 
 
-def create_gif_file(pgn: str, duration: float, output_dir: str,reverse: bool):
+def processFile(pgn: str, duration: float, output_dir: str,reverse: bool):
     """
-    Act as a calling function for the create_gif.
+    Act as a calling function for the createGif.
     Handles one pgn file at a time.
 
     :pgn: Name of the pgn file
@@ -299,7 +290,7 @@ def create_gif_file(pgn: str, duration: float, output_dir: str,reverse: bool):
         print("gif with name %s already exists." % name)
     else:
         print('Creating ' + name + '....')
-        create_gif(pgn, name, duration, output_dir, reverse)
+        createGif(pgn, name, duration, output_dir, reverse)
         print("done")
 
 
@@ -314,8 +305,8 @@ if __name__ == '__main__':
 
     print('pgn2gif')
     if os.path.isfile(args.path):
-        create_gif_file(args.path, args.speed, args.out, args.reverse)
+        processFile(args.path, args.speed, args.out, args.reverse)
 
     elif os.path.isdir(args.path):
         for pgn in glob.glob(args.path + '*.pgn'):
-            create_gif_file(pgn, args.speed, args.out, args.reverse)
+            processFile(pgn, args.speed, args.out, args.reverse)
