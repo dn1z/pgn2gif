@@ -37,4 +37,4 @@ If you choose to run `python3.6 pgn2gif` without any other option then:
 ```
 
 ## GIF output
-<img src="https://media.giphy.com/media/2UtkKmkhBCfv0bXHBk/giphy.gif">
+<img src="https://github.com/dn1z/pgn2gif/raw/master/gifs/sample.gif">
