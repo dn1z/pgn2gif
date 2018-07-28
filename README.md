@@ -3,7 +3,7 @@ Generate gifs from pgn files of your chess games.
 
 ## Installation
 * You need [python 3.6](https://www.python.org/downloads/) or newer installed.
-* Clone the repo with `git clone https://github.com/dn1z/pgn2gif`
+* Clone the repo with `git clone https://github.com/dn1z/pgn2gif`.
 * In the cloned directory Run
 ```
 pip install -r requirements.txt
@@ -47,5 +47,5 @@ Nd7 37. Rd1 Nc5 38. Rxd8 Nxe6 39. Rxa8 Kf6 40. cxb5 cxb5
 56. Kd4 1-0 
 ```
 
-## GIF output
+### GIF output
 <img src="https://github.com/dn1z/pgn2gif/raw/master/gifs/sample.gif">
