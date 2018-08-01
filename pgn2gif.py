@@ -286,20 +286,21 @@ def processFile(pgn: str, duration: float, output_dir: str,reverse: bool):
     """
     basename = os.path.basename(pgn)
     name = basename[:-4] + '.gif'
-    if name in os.listdir('gifs/'):
+    if name in os.listdir('.'):
         print("gif with name %s already exists." % name)
     else:
-        print('Creating ' + name + '....')
+        print('Creating ' + name, end='.... ')
         createGif(pgn, name, duration, output_dir, reverse)
-        print("done")
+        print('done')
 
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
+
     parser.add_argument('-p', '--path', help='path to the pgn file/folder', default=os.getcwd() + '/')
-    parser.add_argument('-s', '--speed', help='Speed with which pieces move in gif.', default=0.5)
-    parser.add_argument('-o', '--out', help='Name of the output folder', default=os.getcwd() + '/gifs')
+    parser.add_argument('-s', '--speed', help='Speed with which pieces move in gif.', default=0.4)
+    parser.add_argument('-o', '--out', help='Name of the output folder', default=os.getcwd())
     parser.add_argument('-r', '--reverse', help='Whether reverse board or not', default=False)
     args = parser.parse_args()
 
