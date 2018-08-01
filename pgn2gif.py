@@ -79,7 +79,7 @@ def update(move: str, turn: int):
             # Promotion with capture e.g. bc1=Q
             if len(move) == 5:
                 clear(point_of_square(to))
-            exec(f'board.paste({p},{pointOfSquare(to)},{p})')
+            exec(f'board.paste({p},{point_of_square(to)},{p})')
     else:
         if turn == 0:
             k = 'wk'
@@ -103,8 +103,8 @@ def update(move: str, turn: int):
 
         update_pieces(current, ks, k)
         clear(point_of_square(current))
-        exec(f'board.paste({k},{pointOfSquare(ks)},{k})')
-        exec(f'board.paste({r},{pointOfSquare(rs)},{r})')
+        exec(f'board.paste({k},{point_of_square(ks)},{k})')
+        exec(f'board.paste({r},{point_of_square(rs)},{r})')
 
 
 def check_knight_move(sqr1: str, sqr2: str) -> bool:
@@ -226,7 +226,7 @@ def point_of_source(move: str, turn: int) -> tuple:
     elif move[0] == 'Q':
         p = 'wq' if turn == 0 else 'bq'
         if len(move) == 3:
-            source = next(sq for sq, pt in pieces.items() if pt == p and (checkLine(sq, to) or ccheck_diagonalsq, to)))
+            source = next(sq for sq, pt in pieces.items() if pt == p and (check_line(sq, to) or check_diagonal(sq, to)))
         else:
             indicator = move[1]
             source = next(sq for sq, pt in pieces.items() if pt == p and indicator in (move[0], move[1]))
@@ -243,7 +243,7 @@ def point_of_source(move: str, turn: int) -> tuple:
     return point_of_square(source)
 
 
-def createGif(file_name: str, out_name: str, duration: float, output_dir: str, reverse: bool):
+def create_gif(file_name: str, out_name: str, duration: float, output_dir: str, reverse: bool):
     global is_reversed
     is_reversed = reverse 
 
@@ -266,8 +266,8 @@ def createGif(file_name: str, out_name: str, duration: float, output_dir: str, r
     images = [np.array(board)]
     moves = get_moves_from_pgn(file_name)
 
-    for i in range(len(moves)):
-        update(moves[i], i % 2)
+    for i,move in enumerate(moves):
+        update(move, i % 2)
         images.append(np.array(board))
 
     for i in range(3):
@@ -290,7 +290,7 @@ def process_file(pgn: str, duration: float, output_dir: str,reverse: bool):
         print("gif with name %s already exists." % name)
     else:
         print('Creating ' + name, end='.... ')
-        createGif(pgn, name, duration, output_dir, reverse)
+        create_gif(pgn, name, duration, output_dir, reverse)
         print('done')
 
 
