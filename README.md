@@ -24,10 +24,9 @@ Options:
 
 __NOTE__
 
-If you choose to run `python3.6 pgn2gif` without any other option then:
+If you choose to run pgn2gif without any other option then:
 
 * pgn file must be present within the current working directory
-* There must be a `gifs` folder present in the current working directory.
 
 ## Example
 
