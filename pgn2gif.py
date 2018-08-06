@@ -81,30 +81,25 @@ def update(move, turn):
                 clear(point_of_square(to))
             exec(f'board.paste({p},{point_of_square(to)},{p})')
     else:
-        if turn == 0:
-            k = 'wk'
-            r = 'wr'
-            row = '1'
-        else:
-            k = 'bk'
-            r = 'br'
-            row = '8'
-        current = 'e' + row
+        row = '1' if turn == 0 else '8'
+        t = 'w' if turn == 0 else 'b'
+        k = 'e' + row
         if move.count('O') == 2:
-            ks = 'g' + row
-            rs = 'f' + row
-            clear(point_of_square('h' + row))
-            update_pieces('h' + row, rs, r)
+            r = 'h' + row
+            k_to = 'g' + row
+            r_to = 'f' + row
         else:
-            ks = 'c' + row
-            rs = 'd' + row
-            clear(point_of_square('a' + row))
-            update_pieces('a' + row, rs, r)
+            r = 'a' + row
+            k_to = 'c' + row
+            r_to = 'd' + row 
 
-        update_pieces(current, ks, k)
-        clear(point_of_square(current))
-        exec(f'board.paste({k},{point_of_square(ks)},{k})')
-        exec(f'board.paste({r},{point_of_square(rs)},{r})')
+        update_pieces(k, k_to, t + 'k')
+        update_pieces(r, r_to, t + 'r')
+        clear(point_of_square(r)) 
+        clear(point_of_square(k))
+        exec('board.paste({0},point_of_square({1}),{0})'.format(t + 'k', 'k_to'))
+        exec('board.paste({0},point_of_square({1}),{0})'.format(t + 'r', 'r_to'))
+
 
 
 def check_knight_move(sqr1, sqr2):
