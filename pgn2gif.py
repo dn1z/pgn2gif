@@ -1,7 +1,7 @@
-import argparse
-import glob
 import os
 import re
+import glob
+import argparse
 
 import imageio
 import numpy as np
