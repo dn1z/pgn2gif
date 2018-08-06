@@ -101,7 +101,6 @@ def update(move, turn):
         exec('board.paste({0},point_of_square({1}),{0})'.format(t + 'r', 'r_to'))
 
 
-
 def check_knight_move(sqr1, sqr2):
     v = abs(columns.index(sqr1[0]) - columns.index(sqr2[0]))
     if v == 1:
@@ -149,12 +148,26 @@ def update_pieces(frm, to, piece_type):
     pieces[to] = piece_type
 
 
+def find(move, to, piece):
+    p = piece[1]
+    if len(move) == 3:
+        indicator = ''
+    else:
+        indicator = move[1]
+
+    if p == 'r':
+        return next(sq for sq, pt in pieces.items() if pt == piece and indicator in sq and check_line(sq, to))
+    elif p == 'b':
+        return next(sq for sq, pt in pieces.items() if pt == piece and indicator in sq and check_diagonal(sq, to))
+    elif p == 'n':
+        return next(sq for sq, pt in pieces.items() if pt == piece and indicator in sq and check_knight_move(sq, to))
+    else:
+        return next(sq for sq, pt in pieces.items() if pt == piece and indicator in sq and (check_line(sq, to) or check_diagonal(sq, to)))
+
+
 def point_of_source(move, turn):
-    # Presents which square move has played
     to = move[-2:]
-    # Presents which square move came from
     source = ''
-    # Presents piece type
     p = ''
 
     c = move[-2]
@@ -189,50 +202,9 @@ def point_of_source(move, turn):
                 pieces[next_pawn] = ''
                 source = move[0] + next_pawn[-1]
 
-    elif move[0] == 'K':
-        p = 'wk' if turn == 0 else 'bk'
-        source = next(sq for sq, pt in pieces.items() if pt == p)
-
-    elif move[0] == 'B':
-        p = 'wb' if turn == 0 else 'bb'
-        if len(move) == 3:
-            source = next(sq for sq, pt in pieces.items() if pt == p and check_diagonal(sq, to))
-        else:
-            indicator = move[1]
-            source = next(sq for sq, pt in pieces.items() if pt == p and indicator in sq and check_diagonal(sq, to))
-
-    elif move[0] == 'R':
-        p = 'wr' if turn == 0 else 'br'
-        # e.g. Ra3
-        if len(move) == 3:
-            try:
-                source = c + next(row for row in rows if pieces[c + str(row)] == p and check_line(c + str(row), to))
-
-            except:
-                source = next(col for col in columns if pieces[col + str(r)] == p and check_line(col + str(r), to)) + str(r)
-        # e.g. Raa3
-        else:
-            indicator = move[1]
-            if indicator in columns:
-                source = indicator + next(row for row in rows if pieces[indicator + row] == p)
-            else:
-                source = next(col for col in columns if pieces[col + indicator] == p) + indicator
-
-    elif move[0] == 'Q':
-        p = 'wq' if turn == 0 else 'bq'
-        if len(move) == 3:
-            source = next(sq for sq, pt in pieces.items() if pt == p and (check_line(sq, to) or check_diagonal(sq, to)))
-        else:
-            indicator = move[1]
-            source = next(sq for sq, pt in pieces.items() if pt == p and indicator in (move[0], move[1]))
-
-    elif move[0] == 'N':
-        p = 'wn' if turn == 0 else 'bn'
-        if len(move) == 3:
-            source = next(sq for sq, pt in pieces.items() if pt == p and check_knight_move(sq, to))
-        else:
-            indicator = move[1]
-            source = next(sq for sq, pt in pieces.items() if pt == p and indicator in sq and check_knight_move(sq, to))
+    else:
+        p = ('w' if turn == 0 else 'b') + move[0].lower()
+        source = find(move, to, p)
 
     update_pieces(source, to, p)
     return point_of_square(source)
