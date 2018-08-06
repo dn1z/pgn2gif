@@ -27,14 +27,14 @@ wn = img.open('./images/wn.png')
 wr = img.open('./images/wr.png')
 wp = img.open('./images/wp.png')
 
-def get_moves_from_pgn(file_path: str) -> list:
+def get_moves_from_pgn(file_path):
     with open(file_path) as pgn:
         data = pgn.read()        
         moves = re.findall(r'[a-h]x?[a-h]?[1-8]=?[BKNRQ]?|O-O-?O?|[BKNRQ][a-h1-8]?[a-h1-8]?x?[a-h][1-8]',data)
         return [move.replace('x','') for move in moves]
 
 
-def point_of_square(move: str) -> tuple:
+def point_of_square(move):
     c = columns.index(move[-2])
     r = 7 - rows.index(move[-1])
     if is_reversed:
@@ -43,14 +43,14 @@ def point_of_square(move: str) -> tuple:
         return (c * 60, r * 60)
 
 
-def clear(point: tuple):
+def clear(point):
     if (point[0] + point[1]) % 120 == 0:
         board.paste(white_square, point, white_square)
     else:
         board.paste(black_square, point, black_square)
 
 
-def update(move: str, turn: int):
+def update(move, turn):
     if not 'O' in move:
         if not '=' in move:
             to = point_of_square(move)
@@ -107,7 +107,7 @@ def update(move: str, turn: int):
         exec(f'board.paste({r},{point_of_square(rs)},{r})')
 
 
-def check_knight_move(sqr1: str, sqr2: str) -> bool:
+def check_knight_move(sqr1, sqr2):
     v = abs(columns.index(sqr1[0]) - columns.index(sqr2[0]))
     if v == 1:
         return abs(rows.index(sqr1[1]) - rows.index(sqr2[1])) == 2
@@ -116,7 +116,7 @@ def check_knight_move(sqr1: str, sqr2: str) -> bool:
     return False
 
 
-def check_line(sqr1: str, sqr2: str) -> bool:
+def check_line(sqr1, sqr2):
     c1 = sqr1[0]
     c2 = sqr2[0]
     r1 = int(sqr1[1])
@@ -130,7 +130,7 @@ def check_line(sqr1: str, sqr2: str) -> bool:
     return False
 
 
-def check_diagonal(sqr1: str, sqr2: str) -> bool:
+def check_diagonal(sqr1, sqr2):
     c1 = columns.index(sqr1[0])
     c2 = columns.index(sqr2[0])
     r1 = int(sqr1[1])
@@ -149,12 +149,12 @@ def check_diagonal(sqr1: str, sqr2: str) -> bool:
     return False
 
 
-def update_pieces(frm: str, to: str, piece_type: str):
+def update_pieces(frm, to, piece_type):
     pieces[frm] = ''
     pieces[to] = piece_type
 
 
-def point_of_source(move: str, turn: int) -> tuple:
+def point_of_source(move, turn):
     # Presents which square move has played
     to = move[-2:]
     # Presents which square move came from
@@ -243,7 +243,7 @@ def point_of_source(move: str, turn: int) -> tuple:
     return point_of_square(source)
 
 
-def create_gif(file_name: str, out_name: str, duration: float, output_dir: str, reverse: bool):
+def create_gif(file_name, out_name, duration, output_dir, reverse):
     global is_reversed
     is_reversed = reverse 
 
@@ -276,7 +276,7 @@ def create_gif(file_name: str, out_name: str, duration: float, output_dir: str, 
     imageio.mimsave(f'{output_dir}/{out_name}', images, duration=duration)
 
 
-def process_file(pgn: str, duration: float, output_dir: str,reverse: bool):
+def process_file(pgn, duration, output_dir, reverse):
     """
     Act as a calling function for the createGif.
     Handles one pgn file at a time.
