@@ -30,6 +30,7 @@ wp = img.open('./images/wp.png')
 def get_moves_from_pgn(file_path):
     with open(file_path) as pgn:
         data = pgn.read()        
+        data = re.sub(r'\{.*?\}', '', data) # Removes pgn comments
         moves = re.findall(r'[a-h]x?[a-h]?[1-8]=?[BKNRQ]?|O-O-?O?|[BKNRQ][a-h1-8]?[a-h1-8]?x?[a-h][1-8]',data)
         return [move.replace('x','') for move in moves]
 
