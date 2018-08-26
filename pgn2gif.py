@@ -35,7 +35,7 @@ def get_moves_from_pgn(file_path):
         return [move.replace('x','') for move in moves]
 
 
-def point_of_square(move):
+def coordinates_of_square(move):
     c = columns.index(move[-2])
     r = 7 - rows.index(move[-1])
     if is_reversed:
@@ -44,18 +44,18 @@ def point_of_square(move):
         return (c * 60, r * 60)
 
 
-def clear(point):
-    if (point[0] + point[1]) % 120 == 0:
-        board.paste(white_square, point, white_square)
+def clear(crd):
+    if (crd[0] + crd[1]) % 120 == 0:
+        board.paste(white_square, crd, white_square)
     else:
-        board.paste(black_square, point, black_square)
+        board.paste(black_square, crd, black_square)
 
 
 def update(move, turn):
     if not 'O' in move:
         if not '=' in move:
-            to = point_of_square(move)
-            frm = point_of_source(move, turn)
+            to = coordinates_of_square(move)
+            frm = coordinates_of_source(move, turn)
 
             clear(frm)
             if pieces[move[-2:]] != '':
@@ -76,11 +76,11 @@ def update(move, turn):
                 frm = move[0] + str(int(move[-3]) + 1)
 
             update_pieces(frm, to, p)
-            clear(point_of_square(frm))
+            clear(coordinates_of_square(frm))
             # Promotion with capture e.g. bc1=Q
             if len(move) == 5:
-                clear(point_of_square(to))
-            exec(f'board.paste({p},{point_of_square(to)},{p})')
+                clear(coordinates_of_square(to))
+            board.paste(p,coordinates_of_square(to),p)
     else:
         row = '1' if turn == 0 else '8'
         t = 'w' if turn == 0 else 'b'
@@ -96,10 +96,10 @@ def update(move, turn):
 
         update_pieces(k, k_to, t + 'k')
         update_pieces(r, r_to, t + 'r')
-        clear(point_of_square(r)) 
-        clear(point_of_square(k))
-        exec('board.paste({0},point_of_square({1}),{0})'.format(t + 'k', 'k_to'))
-        exec('board.paste({0},point_of_square({1}),{0})'.format(t + 'r', 'r_to'))
+        clear(coordinates_of_square(r)) 
+        clear(coordinates_of_square(k))
+        exec('board.paste({0},coordinates_of_square({1}),{0})'.format(t + 'k', 'k_to'))
+        exec('board.paste({0},coordinates_of_square({1}),{0})'.format(t + 'r', 'r_to'))
 
 
 def check_knight_move(sqr1, sqr2):
@@ -166,7 +166,7 @@ def find(move, to, piece):
         return next(sq for sq, pt in pieces.items() if pt == piece and indicator in sq and (check_line(sq, to) or check_diagonal(sq, to)))
 
 
-def point_of_source(move, turn):
+def coordinates_of_source(move, turn):
     to = move[-2:]
     source = ''
     p = ''
@@ -199,7 +199,7 @@ def point_of_source(move, turn):
                     next_pawn = c + str(r - 1)
                 else:
                     next_pawn = c + str(r + 1)
-                clear(point_of_square(next_pawn))
+                clear(coordinates_of_square(next_pawn))
                 pieces[next_pawn] = ''
                 source = move[0] + next_pawn[-1]
 
@@ -208,7 +208,7 @@ def point_of_source(move, turn):
         source = find(move, to, p)
 
     update_pieces(source, to, p)
-    return point_of_square(source)
+    return coordinates_of_square(source)
 
 
 def create_gif(file_name, out_name, duration, output_dir, reverse):
@@ -241,17 +241,10 @@ def create_gif(file_name, out_name, duration, output_dir, reverse):
     for i in range(3):
         images.append(np.array(board))
 
-    imageio.mimsave(f'{output_dir}/{out_name}', images, duration=duration)
+    imageio.mimsave(output_dir + '/' + out_name, images, duration=duration)
 
 
 def process_file(pgn, duration, output_dir, reverse):
-    """
-    Act as a calling function for the createGif.
-    Handles one pgn file at a time.
-
-    :pgn: Name of the pgn file
-    :duration: Speed of the pieces moving in a gif
-    """
     basename = os.path.basename(pgn)
     name = basename[:-4] + '.gif'
     if name in os.listdir('.'):
@@ -263,10 +256,8 @@ def process_file(pgn, duration, output_dir, reverse):
 
 
 if __name__ == '__main__':
-
     parser = argparse.ArgumentParser()
-
-    parser.add_argument('-p', '--path', help='path to the pgn file/folder', default=os.getcwd() + '/')
+    parser.add_argument('-p', '--path', help='Path to the pgn file/folder', default=os.getcwd() + '/')
     parser.add_argument('-s', '--speed', help='Speed with which pieces move in gif.', default=0.4)
     parser.add_argument('-o', '--out', help='Name of the output folder', default=os.getcwd())
     parser.add_argument('-r', '--reverse', help='Whether reverse board or not', default=False)
