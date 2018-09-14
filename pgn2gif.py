@@ -35,9 +35,9 @@ def get_moves_from_pgn(file_path):
         return [move.replace('x','') for move in moves]
 
 
-def coordinates_of_square(move):
-    c = columns.index(move[-2])
-    r = 7 - rows.index(move[-1])
+def coordinates_of_square(square):
+    c = columns.index(square[0])
+    r = 7 - rows.index(square[1])
     if is_reversed:
         return ((7 - c) * 60, (7 - r) * 60)
     else:
@@ -46,60 +46,39 @@ def coordinates_of_square(move):
 
 def clear(crd):
     if (crd[0] + crd[1]) % 120 == 0:
-        board.paste(white_square, crd, white_square)
+        board_image.paste(white_square, crd, white_square)
     else:
-        board.paste(black_square, crd, black_square)
+        board_image.paste(black_square, crd, black_square)
 
 
 def update(move, turn):
-    if not 'O' in move:
-        if not '=' in move:
-            to = coordinates_of_square(move)
-            frm = coordinates_of_source(move, turn)
+    if 'O' in move:
+        castle(move, turn)
 
-            clear(frm)
-            if pieces[move[-2:]] != '':
-                clear(to)
+    elif '=' in move:
+        promotion(move, turn)
 
-            if move[0] in ('N', 'K', 'Q', 'R', 'B'):
-                exec('board.paste(w{0},to,w{0}) if turn == 0 else board.paste(b{0},to,b{0})'.format(move[0].lower()))
-            else:
-                board.paste(wp, to, wp) if turn == 0 else board.paste(bp, to, bp)
-        else:
-            # Pawn promotion e.g. c8=Q
-            to = move[-4:-2]
-            p = 'w' + move[-1].lower() if turn == 0 else 'b' + move[-1].lower()
-
-            if turn == 0:
-                frm = move[0] + str(int(move[-3]) - 1)
-            else:
-                frm = move[0] + str(int(move[-3]) + 1)
-
-            update_pieces(frm, to, p)
-            clear(coordinates_of_square(frm))
-            # Promotion with capture e.g. bc1=Q
-            if len(move) == 5:
-                clear(coordinates_of_square(to))
-            board.paste(p,coordinates_of_square(to),p)
     else:
-        row = '1' if turn == 0 else '8'
-        t = 'w' if turn == 0 else 'b'
-        k = 'e' + row
-        if move.count('O') == 2:
-            r = 'h' + row
-            k_to = 'g' + row
-            r_to = 'f' + row
+        destination_square = move[-2:]
+        if (move.islower()):
+            piece_type = ('w' if turn == 0 else 'b') + 'p'
+            coming_square = find_pawn(move, turn)
         else:
-            r = 'a' + row
-            k_to = 'c' + row
-            r_to = 'd' + row 
+            piece_type = ('w' if turn == 0 else 'b') + move[0].lower()
+            coming_square = find_non_pawn(move, destination_square, ('w' if turn == 0 else 'b') + move[0].lower())
+        update_board(coming_square, destination_square, piece_type)
 
-        update_pieces(k, k_to, t + 'k')
-        update_pieces(r, r_to, t + 'r')
-        clear(coordinates_of_square(r)) 
-        clear(coordinates_of_square(k))
-        exec('board.paste({0},coordinates_of_square({1}),{0})'.format(t + 'k', 'k_to'))
-        exec('board.paste({0},coordinates_of_square({1}),{0})'.format(t + 'r', 'r_to'))
+        to = coordinates_of_square(destination_square)
+        frm = coordinates_of_square(coming_square)
+
+        clear(frm)
+        if board[destination_square] != '':
+            clear(to)
+
+        if move[0] in ('N', 'K', 'Q', 'R', 'B'):
+            exec('board_image.paste(w{0},to,w{0}) if turn == 0 else board_image.paste(b{0},to,b{0})'.format(move[0].lower()))
+        else:
+            board_image.paste(wp, to, wp) if turn == 0 else board_image.paste(bp, to, bp)
 
 
 def check_knight_move(sqr1, sqr2):
@@ -119,9 +98,9 @@ def check_line(sqr1, sqr2):
     if r1 == r2:
         i1 = columns.index(c1)
         i2 = columns.index(c2)
-        return all(pieces[columns[i] + str(r1)] == '' for i in range(min(i1, i2) + 1, max(i1, i2)))
+        return all(board[columns[i] + str(r1)] == '' for i in range(min(i1, i2) + 1, max(i1, i2)))
     elif c1 == c2:
-        return all(pieces[c1 + str(i)] == '' for i in range(min(r1, r2) + 1, max(r1, r2)))
+        return all(board[c1 + str(i)] == '' for i in range(min(r1, r2) + 1, max(r1, r2)))
     return False
 
 
@@ -134,95 +113,119 @@ def check_diagonal(sqr1, sqr2):
         if c1 > c2 and r1 > r2 or c2 > c1 and r2 > r1:
             min_c = min(c1, c2)
             min_r = min(r1, r2)
-            return all(pieces[columns[min_c+i] + str(min_r + i)] == '' for i in range(1, abs(c1-c2)))
+            return all(board[columns[min_c+i] + str(min_r + i)] == '' for i in range(1, abs(c1-c2)))
 
         elif c1 > c2 and r2 > r1:
-            return all(pieces[columns[c2 + i] + str(r2 - i)] == '' for i in range(1, c1 - c2))
+            return all(board[columns[c2 + i] + str(r2 - i)] == '' for i in range(1, c1 - c2))
 
         else:
-            return all(pieces[columns[c2 - i] + str(r2 + i)] == '' for i in range(1, c2 - c1))
+            return all(board[columns[c2 - i] + str(r2 + i)] == '' for i in range(1, c2 - c1))
     return False
 
 
-def update_pieces(frm, to, piece_type):
-    pieces[frm] = ''
-    pieces[to] = piece_type
+def update_board(frm, to, piece_type):
+    board[frm] = ''
+    board[to] = piece_type
 
 
-def find(move, to, piece):
+def find_non_pawn(move, to, piece):
+    if len(move) == 5:
+        return move[1:3]
+
     p = piece[1]
-    if len(move) == 3:
-        indicator = ''
-    else:
-        indicator = move[1]
-
+    indicator = '' if len(move) == 3 else move[1]
     if p == 'r':
-        return next(sq for sq, pt in pieces.items() if pt == piece and indicator in sq and check_line(sq, to))
+        return next(sq for sq, pt in board.items() if pt == piece and indicator in sq and check_line(sq, to))
     elif p == 'b':
-        return next(sq for sq, pt in pieces.items() if pt == piece and indicator in sq and check_diagonal(sq, to))
+        return next(sq for sq, pt in board.items() if pt == piece and indicator in sq and check_diagonal(sq, to))
     elif p == 'n':
-        return next(sq for sq, pt in pieces.items() if pt == piece and indicator in sq and check_knight_move(sq, to))
+        return next(sq for sq, pt in board.items() if pt == piece and indicator in sq and check_knight_move(sq, to))
     else:
-        return next(sq for sq, pt in pieces.items() if pt == piece and indicator in sq and (check_line(sq, to) or check_diagonal(sq, to)))
+        return next(sq for sq, pt in board.items() if pt == piece and indicator in sq and (check_line(sq, to) or check_diagonal(sq, to)))
 
 
-def coordinates_of_source(move, turn):
-    to = move[-2:]
-    source = ''
-    p = ''
-
+def find_pawn(move, turn):
+    piece_type = 'wp' if turn == 0 else 'bp'
     c = move[-2]
     r = int(move[-1])
 
-    if len(move) == 5:
-        source = move[1:3]
-        p = move[0].lower()
-
-    elif move.islower():
-        p = 'wp' if turn == 0 else 'bp'
-        # Pushing pawn e.g. e4
-        if len(move) == 2:
-            if turn == 0:
-                source = c + next(str(i) for i in range(r, 0, -1) if pieces[c + str(i)] == p)
-            else:
-                source = c + next(str(i) for i in range(r, 9) if pieces[c + str(i)] == p)
-        # Capturing pawn e.g. ed5
-        elif len(move) == 3:
-            if pieces[move[-2:]] != '':
-                if turn == 0:
-                    source = move[0] + str(r - 1)
-                else:
-                    source = move[0] + str(r + 1)
-            # En Passant
-            else:
-                if turn == 0:
-                    next_pawn = c + str(r - 1)
-                else:
-                    next_pawn = c + str(r + 1)
-                clear(coordinates_of_square(next_pawn))
-                pieces[next_pawn] = ''
-                source = move[0] + next_pawn[-1]
-
+    if len(move) == 2:
+        if turn == 0:
+            comes_from = c + next(str(i) for i in range(r, 0, -1) if board[c + str(i)] == piece_type)
+        else:
+            comes_from = c + next(str(i) for i in range(r, 9) if board[c + str(i)] == piece_type)
     else:
-        p = ('w' if turn == 0 else 'b') + move[0].lower()
-        source = find(move, to, p)
+        if board[move[-2:]] != '':
+            if turn == 0:
+                comes_from = move[0] + str(r - 1)
+            else:
+                comes_from = move[0] + str(r + 1)
+        # En Passant
+        else:
+            if turn == 0:
+                next_pawn_square = c + str(r - 1)
+            else:
+                next_pawn_square = c + str(r + 1)
 
-    update_pieces(source, to, p)
-    return coordinates_of_square(source)
+            clear(coordinates_of_square(next_pawn_square))
+            board[next_pawn_square] = ''
+            comes_from = move[0] + next_pawn_square[-1]
+
+    return comes_from
+
+
+def castle(move, turn):
+    row = '1' if turn == 0 else '8'
+    t = 'w' if turn == 0 else 'b'
+    k = 'e' + row
+    if move.count('O') == 2:
+        r = 'h' + row
+        k_to = 'g' + row
+        r_to = 'f' + row
+    else:
+        r = 'a' + row
+        k_to = 'c' + row
+        r_to = 'd' + row 
+
+    update_board(k, k_to, t + 'k')
+    update_board(r, r_to, t + 'r')
+    clear(coordinates_of_square(r)) 
+    clear(coordinates_of_square(k))
+    exec('board_image.paste({0},coordinates_of_square({1}),{0})'.format(t + 'k', 'k_to'))
+    exec('board_image.paste({0},coordinates_of_square({1}),{0})'.format(t + 'r', 'r_to'))
+
+
+def promotion(move, turn):
+    piece_type = 'w' + move[-1].lower() if turn == 0 else 'b' + move[-1].lower()
+
+    if turn == 0:
+        frm = move[0] + str(int(move[-3]) - 1)
+    else:
+        frm = move[0] + str(int(move[-3]) + 1)
+
+    update_board(frm, move[-4:-2], piece_type)
+
+    to = coordinates_of_square(move[-4:-2])
+
+    clear(coordinates_of_square(frm))
+    if len(move) == 5:
+        clear(to)
+
+    exec('board_image.paste({0},to,{0})'.format(piece_type))
 
 
 def create_gif(file_name, out_name, duration, output_dir, reverse):
     global is_reversed
     is_reversed = reverse 
 
-    global board
+    global board_image
     if is_reversed:
-        board = img.open('./images/board2.png')
+        board_image = img.open('./images/board2.png')
     else:
-        board = img.open('./images/board.png')
+        board_image = img.open('./images/board.png') 
     
-    global pieces
-    pieces = {'a8': 'br', 'b8': 'bn', 'c8': 'bb', 'd8': 'bq', 'e8': 'bk', 'f8': 'bb', 'g8': 'bn', 'h8': 'br',
+    global board
+    board =  {'a8': 'br', 'b8': 'bn', 'c8': 'bb', 'd8': 'bq', 'e8': 'bk', 'f8': 'bb', 'g8': 'bn', 'h8': 'br',
               'a7': 'bp', 'b7': 'bp', 'c7': 'bp', 'd7': 'bp', 'e7': 'bp', 'f7': 'bp', 'g7': 'bp', 'h7': 'bp',
               'a6': '', 'b6': '', 'c6': '', 'd6': '', 'e6': '', 'f6': '', 'g6': '', 'h6': '',
               'a5': '', 'b5': '', 'c5': '', 'd5': '', 'e5': '', 'f5': '', 'g5': '', 'h5': '',
@@ -231,15 +234,15 @@ def create_gif(file_name, out_name, duration, output_dir, reverse):
               'a2': 'wp', 'b2': 'wp', 'c2': 'wp', 'd2': 'wp', 'e2': 'wp', 'f2': 'wp', 'g2': 'wp', 'h2': 'wp',
               'a1': 'wr', 'b1': 'wn', 'c1': 'wb', 'd1': 'wq', 'e1': 'wk', 'f1': 'wb', 'g1': 'wn', 'h1': 'wr'}
 
-    images = [np.array(board)]
+    images = [np.array(board_image)]
     moves = get_moves_from_pgn(file_name)
 
     for i,move in enumerate(moves):
         update(move, i % 2)
-        images.append(np.array(board))
+        images.append(np.array(board_image))
 
     for i in range(3):
-        images.append(np.array(board))
+        images.append(np.array(board_image))
 
     imageio.mimsave(output_dir + '/' + out_name, images, duration=duration)
 
@@ -258,7 +261,7 @@ def process_file(pgn, duration, output_dir, reverse):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--path', help='Path to the pgn file/folder', default=os.getcwd() + '/')
-    parser.add_argument('-s', '--speed', help='Speed with which pieces move in gif.', default=0.4)
+    parser.add_argument('-s', '--speed', help='Speed with which piee move in gif.', default=0.4)
     parser.add_argument('-o', '--out', help='Name of the output folder', default=os.getcwd())
     parser.add_argument('-r', '--reverse', help='Whether reverse board or not', default=False)
     args = parser.parse_args()
