@@ -134,6 +134,7 @@ def find_non_pawn(move, to, piece):
 
     p = piece[1]
     indicator = '' if len(move) == 3 else move[1]
+    
     if p == 'r':
         return next(sq for sq, pt in board.items() if pt == piece and indicator in sq and check_line(sq, to))
     elif p == 'b':
@@ -189,8 +190,10 @@ def castle(move, turn):
 
     update_board(k, k_to, t + 'k')
     update_board(r, r_to, t + 'r')
+    
     clear(coordinates_of_square(r)) 
     clear(coordinates_of_square(k))
+    
     exec('board_image.paste({0},coordinates_of_square({1}),{0})'.format(t + 'k', 'k_to'))
     exec('board_image.paste({0},coordinates_of_square({1}),{0})'.format(t + 'r', 'r_to'))
 
@@ -199,9 +202,9 @@ def promotion(move, turn):
     piece_type = 'w' + move[-1].lower() if turn == 0 else 'b' + move[-1].lower()
 
     if turn == 0:
-        frm = move[0] + str(int(move[-3]) - 1)
+        frm = move[0] + "7"
     else:
-        frm = move[0] + str(int(move[-3]) + 1)
+        frm = move[0] + "2"
 
     update_board(frm, move[-4:-2], piece_type)
 
