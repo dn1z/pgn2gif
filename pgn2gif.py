@@ -65,7 +65,7 @@ def update(move, turn):
             coming_square = find_pawn(move, turn)
         else:
             piece_type = ('w' if turn == 0 else 'b') + move[0].lower()
-            coming_square = find_non_pawn(move, destination_square, ('w' if turn == 0 else 'b') + move[0].lower())
+            coming_square = find_non_pawn(move, destination_square, piece_type)
         update_board(coming_square, destination_square, piece_type)
 
         to = coordinates_of_square(destination_square)
