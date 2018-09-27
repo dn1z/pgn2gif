@@ -75,11 +75,8 @@ def update(move, turn):
         if board[destination_square] != '':
             clear(to)
 
-        if move[0] in ('N', 'K', 'Q', 'R', 'B'):
-            exec('board_image.paste(w{0},to,w{0}) if turn == 0 else board_image.paste(b{0},to,b{0})'.format(move[0].lower()))
-        else:
-            board_image.paste(wp, to, wp) if turn == 0 else board_image.paste(bp, to, bp)
-
+        exec('board_image.paste({0},to,{0})'.format(piece_type))
+        
 
 def check_knight_move(sqr1, sqr2):
     v = abs(columns.index(sqr1[0]) - columns.index(sqr2[0]))
