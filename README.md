@@ -17,7 +17,7 @@ Usage
 
 Options:
     -p, --path          Path to the pgn file/folder
-    -s, --speed         Speed of the pieces moving in gif
+    -d, --delay         Delay between moves in seconds
     -o, --out           Path to the gif output directory
     -r, --reverse       Whether reverse board or not
 ```
