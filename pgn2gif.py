@@ -261,7 +261,7 @@ def process_file(pgn, duration, output_dir, reverse):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--path', help='Path to the pgn file/folder', default=os.getcwd() + '/')
-    parser.add_argument('-s', '--speed', help='Speed with which piee move in gif.', default=0.4)
+    parser.add_argument('-d', '--delay', help='Delay between moves in seconds', default=0.4)
     parser.add_argument('-o', '--out', help='Name of the output folder', default=os.getcwd())
     parser.add_argument('-r', '--reverse', help='Whether reverse board or not', default=False)
     args = parser.parse_args()
