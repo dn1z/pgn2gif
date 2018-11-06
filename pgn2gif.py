@@ -29,7 +29,7 @@ wp = img.open('./images/wp.png')
 
 def get_moves_from_pgn(file_path):
     with open(file_path) as pgn:
-        data = pgn.read()        
+        data = pgn.read()
         data = re.sub(r'\{.*?\}', '', data) # Removes pgn comments
         moves = re.findall(r'[a-h]x?[a-h]?[1-8]=?[BKNRQ]?|O-O-?O?|[BKNRQ][a-h1-8]?[a-h1-8]?x?[a-h][1-8]',data)
         return [move.replace('x','') for move in moves]
@@ -76,7 +76,7 @@ def update(move, turn):
             clear(to)
 
         exec('board_image.paste({0},to,{0})'.format(piece_type))
-        
+
 
 def check_knight_move(sqr1, sqr2):
     v = abs(columns.index(sqr1[0]) - columns.index(sqr2[0]))
@@ -131,7 +131,7 @@ def find_non_pawn(move, to, piece):
 
     p = piece[1]
     indicator = '' if len(move) == 3 else move[1]
-    
+
     if p == 'r':
         return next(sq for sq, pt in board.items() if pt == piece and indicator in sq and check_line(sq, to))
     elif p == 'b':
@@ -183,14 +183,14 @@ def castle(move, turn):
     else:
         r = 'a' + row
         k_to = 'c' + row
-        r_to = 'd' + row 
+        r_to = 'd' + row
 
     update_board(k, k_to, t + 'k')
     update_board(r, r_to, t + 'r')
-    
-    clear(coordinates_of_square(r)) 
+
+    clear(coordinates_of_square(r))
     clear(coordinates_of_square(k))
-    
+
     exec('board_image.paste({0},coordinates_of_square({1}),{0})'.format(t + 'k', 'k_to'))
     exec('board_image.paste({0},coordinates_of_square({1}),{0})'.format(t + 'r', 'r_to'))
 
@@ -216,14 +216,14 @@ def promotion(move, turn):
 
 def create_gif(file_name, out_name, duration, output_dir, reverse):
     global is_reversed
-    is_reversed = reverse 
+    is_reversed = reverse
 
     global board_image
     if is_reversed:
         board_image = img.open('./images/board2.png')
     else:
-        board_image = img.open('./images/board.png') 
-    
+        board_image = img.open('./images/board.png')
+
     global board
     board =  {'a8': 'br', 'b8': 'bn', 'c8': 'bb', 'd8': 'bq', 'e8': 'bk', 'f8': 'bb', 'g8': 'bn', 'h8': 'br',
               'a7': 'bp', 'b7': 'bp', 'c7': 'bp', 'd7': 'bp', 'e7': 'bp', 'f7': 'bp', 'g7': 'bp', 'h7': 'bp',
@@ -268,8 +268,8 @@ if __name__ == '__main__':
 
     print('pgn2gif')
     if os.path.isfile(args.path):
-        process_file(args.path, args.speed, args.out, args.reverse)
+        process_file(args.path, args.delay, args.out, args.reverse)
 
     elif os.path.isdir(args.path):
         for pgn in glob.glob(args.path + '*.pgn'):
-            process_file(pgn, args.speed, args.out, args.reverse)
+            process_file(pgn, args.delay, args.out, args.reverse)
