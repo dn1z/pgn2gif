@@ -19,7 +19,7 @@ Options:
     -p, --path          Path to the pgn file/folder
     -d, --delay         Delay between moves in seconds
     -o, --out           Path to the gif output directory
-    -r, --reverse       Whether reverse board or not
+    -r, --reverse       Reverse board
 ```
 
 __NOTE__
