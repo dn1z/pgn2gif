@@ -1,6 +1,5 @@
 import os
 import re
-import argparse
 
 import imageio
 import numpy as np
@@ -259,6 +258,7 @@ def process_file(pgn, duration, output_dir, reverse):
 
 if __name__ == '__main__':
     import glob
+    import argparse
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--path', help='Path to the pgn file/folder', default=os.getcwd() + '/')
