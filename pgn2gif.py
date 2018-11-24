@@ -264,7 +264,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--path', help='Path to the pgn file/folder', default=os.getcwd() + '/')
     parser.add_argument('-d', '--delay', help='Delay between moves in seconds', default=0.4)
     parser.add_argument('-o', '--out', help='Name of the output folder', default=os.getcwd())
-    parser.add_argument('-r', '--reverse', help='Whether reverse board or not', default=False)
+    parser.add_argument('-r', '--reverse', help='Reverse board', action='store_true')
     args = parser.parse_args()
 
     print('pgn2gif')
