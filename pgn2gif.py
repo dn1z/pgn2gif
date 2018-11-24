@@ -49,20 +49,20 @@ def clear(crd):
         board_image.paste(black_square, crd, black_square)
 
 
-def update(move, turn):
+def update(move, is_white_turn):
     if 'O' in move:
-        castle(move, turn)
+        castle(move, is_white_turn)
 
     elif '=' in move:
-        promotion(move, turn)
+        promotion(move, is_white_turn)
 
     else:
         destination_square = move[-2:]
         if (move.islower()):
-            piece_type = ('w' if turn == 0 else 'b') + 'p'
-            coming_square = find_pawn(move, turn)
+            piece_type = ('w' if is_white_turn else 'b') + 'p'
+            coming_square = find_pawn(move, is_white_turn)
         else:
-            piece_type = ('w' if turn == 0 else 'b') + move[0].lower()
+            piece_type = ('w' if is_white_turn else 'b') + move[0].lower()
             coming_square = find_non_pawn(move, destination_square, piece_type)
         update_board(coming_square, destination_square, piece_type)
 
@@ -140,25 +140,25 @@ def find_non_pawn(move, to, piece):
         return next(sq for sq, pt in board.items() if pt == piece and indicator in sq and (check_line(sq, to) or check_diagonal(sq, to)))
 
 
-def find_pawn(move, turn):
-    piece_type = 'wp' if turn == 0 else 'bp'
+def find_pawn(move, is_white_turn):
+    piece_type = 'wp' if is_white_turn else 'bp'
     c = move[-2]
     r = int(move[-1])
 
     if len(move) == 2:
-        if turn == 0:
+        if is_white_turn:
             comes_from = c + next(str(i) for i in range(r, 0, -1) if board[c + str(i)] == piece_type)
         else:
             comes_from = c + next(str(i) for i in range(r, 9) if board[c + str(i)] == piece_type)
     else:
         if board[move[-2:]] != '':
-            if turn == 0:
+            if is_white_turn:
                 comes_from = move[0] + str(r - 1)
             else:
                 comes_from = move[0] + str(r + 1)
         # En Passant
         else:
-            if turn == 0:
+            if is_white_turn:
                 next_pawn_square = c + str(r - 1)
             else:
                 next_pawn_square = c + str(r + 1)
@@ -170,9 +170,9 @@ def find_pawn(move, turn):
     return comes_from
 
 
-def castle(move, turn):
-    row = '1' if turn == 0 else '8'
-    t = 'w' if turn == 0 else 'b'
+def castle(move, is_white_turn):
+    row = '1' if is_white_turn else '8'
+    t = 'w' if is_white_turn else 'b'
     k = 'e' + row
     if move.count('O') == 2:
         r = 'h' + row
@@ -193,10 +193,10 @@ def castle(move, turn):
     exec('board_image.paste({0},coordinates_of_square({1}),{0})'.format(t + 'r', 'r_to'))
 
 
-def promotion(move, turn):
-    piece_type = 'w' + move[-1].lower() if turn == 0 else 'b' + move[-1].lower()
+def promotion(move, is_white_turn):
+    piece_type = 'w' + move[-1].lower() if is_white_turn else 'b' + move[-1].lower()
 
-    if turn == 0:
+    if is_white_turn:
         frm = move[0] + "7"
     else:
         frm = move[0] + "2"
@@ -236,7 +236,7 @@ def create_gif(file_name, out_name, duration, output_dir, reverse):
     moves = get_moves_from_pgn(file_name)
 
     for i,move in enumerate(moves):
-        update(move, i % 2)
+        update(move, (i + 1) % 2)
         images.append(np.array(board_image))
 
     for i in range(3):
