@@ -266,7 +266,6 @@ if __name__ == '__main__':
     parser.add_argument('-r', '--reverse', help='Reverse board', action='store_true')
     args = parser.parse_args()
 
-    print('pgn2gif')
     if os.path.isfile(args.path):
         process_file(args.path, args.delay, args.out, args.reverse)
 
