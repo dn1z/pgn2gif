@@ -258,7 +258,7 @@ def process_file(pgn, duration, output_dir, reverse):
         print('done')
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--path', help='Path to the pgn file/folder', default=os.getcwd() + '/')
     parser.add_argument('-d', '--delay', help='Delay between moves in seconds', default=0.4)
@@ -272,3 +272,7 @@ if __name__ == '__main__':
     elif os.path.isdir(args.path):
         for pgn in glob.glob(args.path + '*.pgn'):
             process_file(pgn, args.delay, args.out, args.reverse)
+
+
+if __name__ == '__main__':
+    main()
