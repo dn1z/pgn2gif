@@ -13,13 +13,17 @@ pip install -r requirements.txt
 Run `python3 pgn2gif.py` with the following options:
 ```
 Usage
-    pgn2gif.py [-p | -d | -o | -r]
+    pgn2gif.py [-h] [-p PATH] [-d DELAY] [-o OUT] [-r]
+               [--black-square-color BLACK_SQUARE_COLOR]
+               [--white-square-color WHITE_SQUARE_COLOR]
 
-Options:
-    -p, --path          Path to the pgn file/folder
-    -d, --delay         Delay between moves in seconds
-    -o, --out           Path to the gif output directory
-    -r, --reverse       Reverse board
+Optional arguments
+    -p, --path            Path to the pgn file/folder
+    -d, --delay           Delay between moves in seconds
+    -o, --out             Name of the output folder
+    -r, --reverse         Reverse board
+    --black-square-color  Color of black squares in hex
+    --white-square-color  Color of white squares in hex
 ```
 
 __NOTE__
