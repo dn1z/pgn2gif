@@ -7,8 +7,8 @@ import imageio
 import numpy as np
 from PIL import Image as img
 
+rows    = ['1', '2', '3', '4', '5', '6', '7', '8']
 columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-rows = ['1', '2', '3', '4', '5', '6', '7', '8']
 
 bk = img.open('./images/bk.png')
 bq = img.open('./images/bq.png')
@@ -24,8 +24,8 @@ wn = img.open('./images/wn.png')
 wr = img.open('./images/wr.png')
 wp = img.open('./images/wp.png')
 
-def get_moves_from_pgn(file_path):
-    with open(file_path) as pgn:
+def get_moves_from_pgn(pgn_file):
+    with open(pgn_file) as pgn:
         data = pgn.read()
         data = re.sub(r'\{.*?\}', '', data) # Removes pgn comments
         moves = re.findall(r'[a-h]x?[a-h]?[1-8]=?[BKNRQ]?|O-O-?O?|[BKNRQ][a-h1-8]?[a-h1-8]?x?[a-h][1-8]',data)
