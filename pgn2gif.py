@@ -43,7 +43,7 @@ def apply_move(current, previous):
         crd = coordinates_of_square(square)
         clear(board, crd)
 
-        if (current[square] != ''):
+        if current[square] != '':
             exec('board.paste({0}, crd, {0})'.format(current[square]))
 
 def create_gif(pgn, output_dir, out_name, duration):
