@@ -1,8 +1,8 @@
 import re
 
-class ChessGame(object):
-    COLUMNS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+COLUMNS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
+class ChessGame(object):
     def __init__(self):
         self.is_white_turn = True
         self.state = {
@@ -27,7 +27,7 @@ class ChessGame(object):
         r2 = int(sqr2[1])
         if r1 == r2:
             i1, i2 = ord(c1) - 97, ord(c2) - 97
-            return all(self.state[self.COLUMNS[i] + str(r1)] == '' for i in range(min(i1, i2) + 1, max(i1, i2)))
+            return all(self.state[COLUMNS[i] + str(r1)] == '' for i in range(min(i1, i2) + 1, max(i1, i2)))
         elif c1 == c2:
             return all(self.state[c1 + str(i)] == '' for i in range(min(r1, r2) + 1, max(r1, r2)))
         return False
@@ -42,11 +42,11 @@ class ChessGame(object):
             if c1 > c2 and r1 > r2 or c2 > c1 and r2 > r1:
                 min_c = min(c1, c2)
                 min_r = min(r1, r2)
-                return all(self.state[self.COLUMNS[min_c+i] + str(min_r + i)] == '' for i in range(1, abs(c1-c2)))
+                return all(self.state[COLUMNS[min_c+i] + str(min_r + i)] == '' for i in range(1, abs(c1-c2)))
             elif c1 > c2 and r2 > r1:
-                return all(self.state[self.COLUMNS[c2 + i] + str(r2 - i)] == '' for i in range(1, c1 - c2))
+                return all(self.state[COLUMNS[c2 + i] + str(r2 - i)] == '' for i in range(1, c1 - c2))
             else:
-                return all(self.state[self.COLUMNS[c2 - i] + str(r2 + i)] == '' for i in range(1, c2 - c1))
+                return all(self.state[COLUMNS[c2 - i] + str(r2 + i)] == '' for i in range(1, c2 - c1))
 
         return False
 
@@ -97,27 +97,7 @@ class ChessGame(object):
 
         return origin
 
-    def push(self, move):
-        if 'O' in move:
-            self.castle(move)
-
-        elif '=' in move:
-            self.promote(move)
-
-        else:
-            dest = move[-2:]
-            if (move.islower()):
-                pt = ('w' if self.is_white_turn else 'b') + 'p'
-                origin = self.__find_pawn(move)
-            else:
-                pt = ('w' if self.is_white_turn else 'b') + move[0].lower()
-                origin = self.__find_non_pawn(move, dest, pt)
-
-            self.__update_state(origin, dest, pt)
-
-        self.is_white_turn = not self.is_white_turn
-
-    def castle(self, move):
+    def __castle(self, move):
         row, color = ('1', 'w') if self.is_white_turn else ('8', 'b')
         if move.count('O') == 2:
             r = 'h' + row
@@ -131,10 +111,30 @@ class ChessGame(object):
         self.__update_state('e' + row, k_to, color + 'k')
         self.__update_state(r,  r_to, color + 'r')
 
-    def promote(self, move):
+    def __promote(self, move):
         pt = ('w' if self.is_white_turn else 'b') + move[-1].lower()
         origin = move[0] + ('7' if self.is_white_turn else '2')
         self.__update_state(origin, move[-4:-2], pt)
+
+    def push(self, move):
+        if 'O' in move:
+            self.__castle(move)
+
+        elif '=' in move:
+            self.__promote(move)
+
+        else:
+            dest = move[-2:]
+            if (move.islower()):
+                pt = ('w' if self.is_white_turn else 'b') + 'p'
+                origin = self.__find_pawn(move)
+            else:
+                pt = ('w' if self.is_white_turn else 'b') + move[0].lower()
+                origin = self.__find_non_pawn(move, dest, pt)
+
+            self.__update_state(origin, dest, pt)
+
+        self.is_white_turn = not self.is_white_turn
 
 
 def get_moves_from_pgn(pgn):
