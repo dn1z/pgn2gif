@@ -83,36 +83,16 @@ def generate_board():
         for j in range(0, 480, 60):
             clear(board_image, (i, j))
 
-    for i in range(0, 8):
-        if reverse:
-            board_image.paste(wp, (60 * i, 60), wp)
-            board_image.paste(bp, (60 * i, 360), bp)
-        else:
-            board_image.paste(bp, (60 * i, 60), bp)
-            board_image.paste(wp, (60 * i, 360), wp)
+    row = ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r']
+    order = ('w', 'b') if reverse else ('b', 'w')
 
-    for i,p in enumerate(['r', 'n', 'b']):
-        if reverse:
-            exec("board_image.paste(w{0}, ({1}, 0), w{0})".format(p, i * 60))
-            exec("board_image.paste(b{0}, ({1}, 420), b{0})".format(p, 420 - i * 60))
-            exec("board_image.paste(b{0}, ({1}, 420), b{0})".format(p, i * 60))
-            exec("board_image.paste(w{0}, ({1}, 0), w{0})".format(p, 420 - i * 60))
-        else:
-            exec("board_image.paste(b{0}, ({1}, 0), b{0})".format(p, i * 60))
-            exec("board_image.paste(w{0}, ({1}, 420), w{0})".format(p, 420 - i * 60))
-            exec("board_image.paste(w{0}, ({1}, 420), w{0})".format(p, i * 60))
-            exec("board_image.paste(b{0}, ({1}, 0), b{0})".format(p, 420 - i * 60))
+    for i in range(8):
+        col = 60 * i
+        exec('board_image.paste({0}, (col, 0), {0})'.format(order[0] + row[i]))
+        exec('board_image.paste({0}, (col, 420), {0})'.format(order[1] + row[i]))
 
-    if reverse:
-        board_image.paste(wk, (180, 0), wk)
-        board_image.paste(wq, (240, 0), wq)
-        board_image.paste(bk, (180, 420), bk)
-        board_image.paste(bq, (240, 420), bq)
-    else:
-        board_image.paste(wk, (240, 420), wk)
-        board_image.paste(wq, (180, 420), wq)
-        board_image.paste(bk, (240, 0), bk)
-        board_image.paste(bq, (180, 0), bq)
+        exec('board_image.paste({0}p, (col, 60), {0}p)'.format(order[0]))
+        exec('board_image.paste({0}p, (col, 360), {0}p)'.format(order[1]))
 
 def main():
     parser = argparse.ArgumentParser()
@@ -124,16 +104,12 @@ def main():
     parser.add_argument('--white-square-color', help='Color of white squares in hex', default='#EAE9D2')
     args = parser.parse_args()
 
-    to_rgb = lambda h:tuple(int(h[i:i+2], 16) for i in (0, 2 ,4))
-
     global reverse
     reverse = args.reverse
 
-    global white_square
-    white_square = Image.new('RGBA', (60, 60), to_rgb(args.white_square_color.lstrip('#')))
-
-    global black_square
-    black_square = Image.new('RGBA', (60, 60), to_rgb(args.black_square_color.lstrip('#')))
+    global white_square, black_square
+    white_square = Image.new('RGBA', (60, 60), args.white_square_color)
+    black_square = Image.new('RGBA', (60, 60), args.black_square_color)
 
     generate_board()
 
