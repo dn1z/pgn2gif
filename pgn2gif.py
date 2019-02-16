@@ -22,16 +22,21 @@ wn = Image.open('./images/wn.png')
 wr = Image.open('./images/wr.png')
 wp = Image.open('./images/wp.png')
 
+# You can change the size of gif (BOARD_EDGE x BOARD_EDGE)
+# But it is not recommended unless you update piece images to fit square
+BOARD_EDGE = 480
+SQUARE_EDGE = BOARD_EDGE // 8
+
 def coordinates_of_square(square):
     c = ord(square[0]) - 97
     r = int(square[1]) - 1
     if reverse:
-        return ((7 - c) * 60, r * 60)
+        return ((7 - c) * SQUARE_EDGE, r * SQUARE_EDGE)
     else:
-        return (c * 60, (7 -r) * 60)
+        return (c * SQUARE_EDGE, (7 - r) * SQUARE_EDGE)
 
 def clear(image, crd):
-    if (crd[0] + crd[1]) % 120 == 0:
+    if (crd[0] + crd[1]) % (SQUARE_EDGE * 2) == 0:
         image.paste(white_square, crd, white_square)
     else:
         image.paste(black_square, crd, black_square)
@@ -77,22 +82,22 @@ def process_file(pgn, duration, output_dir):
 
 def generate_board():
     global board_image
-    board_image = Image.new('RGB', (480, 480))
+    board_image = Image.new('RGB', (BOARD_EDGE, BOARD_EDGE))
 
-    for i in range(0, 480, 60):
-        for j in range(0, 480, 60):
+    for i in range(0, BOARD_EDGE, SQUARE_EDGE):
+        for j in range(0, BOARD_EDGE, SQUARE_EDGE):
             clear(board_image, (i, j))
 
     row = ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r']
     order = ('w', 'b') if reverse else ('b', 'w')
 
     for i in range(8):
-        col = 60 * i
+        col = SQUARE_EDGE * i
         exec('board_image.paste({0}, (col, 0), {0})'.format(order[0] + row[i]))
-        exec('board_image.paste({0}, (col, 420), {0})'.format(order[1] + row[i]))
+        exec('board_image.paste({0}, (col, BOARD_EDGE - SQUARE_EDGE), {0})'.format(order[1] + row[i]))
 
-        exec('board_image.paste({0}p, (col, 60), {0}p)'.format(order[0]))
-        exec('board_image.paste({0}p, (col, 360), {0}p)'.format(order[1]))
+        exec('board_image.paste({0}p, (col, SQUARE_EDGE), {0}p)'.format(order[0]))
+        exec('board_image.paste({0}p, (col, BOARD_EDGE - (SQUARE_EDGE * 2)), {0}p)'.format(order[1]))
 
 def main():
     parser = argparse.ArgumentParser()
@@ -108,8 +113,8 @@ def main():
     reverse = args.reverse
 
     global white_square, black_square
-    white_square = Image.new('RGBA', (60, 60), args.white_square_color)
-    black_square = Image.new('RGBA', (60, 60), args.black_square_color)
+    white_square = Image.new('RGBA', (SQUARE_EDGE, SQUARE_EDGE), args.white_square_color)
+    black_square = Image.new('RGBA', (SQUARE_EDGE, SQUARE_EDGE), args.black_square_color)
 
     generate_board()
 
