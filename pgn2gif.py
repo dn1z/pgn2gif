@@ -27,6 +27,7 @@ wp = Image.open('./images/wp.png')
 BOARD_EDGE = 480
 SQUARE_EDGE = BOARD_EDGE // 8
 
+
 def coordinates_of_square(square):
     c = ord(square[0]) - 97
     r = int(square[1]) - 1
@@ -35,11 +36,13 @@ def coordinates_of_square(square):
     else:
         return (c * SQUARE_EDGE, (7 - r) * SQUARE_EDGE)
 
+
 def clear(image, crd):
     if (crd[0] + crd[1]) % (SQUARE_EDGE * 2) == 0:
         image.paste(white_square, crd, white_square)
     else:
         image.paste(black_square, crd, black_square)
+
 
 def apply_move(board_image, current, previous):
     changed = [s for s in current.keys() if current[s] != previous[s]]
@@ -50,6 +53,7 @@ def apply_move(board_image, current, previous):
 
         if current[square] != '':
             exec('board_image.paste({0}, crd, {0})'.format(current[square]))
+
 
 def create_gif(pgn, output_dir, out_name, duration):
     board_image = initial_board.copy()
@@ -70,14 +74,16 @@ def create_gif(pgn, output_dir, out_name, duration):
 
     imageio.mimsave(output_dir + '/' + out_name, images, duration=duration)
 
+
 def process_file(pgn, duration, output_dir):
     name = os.path.basename(pgn)[:-4] + '.gif'
     if name in os.listdir(output_dir):
         print('gif with name %s already exists.' % name)
     else:
         print('Creating ' + name, end='... ')
-        create_gif(pgn, output_dir,  name, duration)
+        create_gif(pgn, output_dir, name, duration)
         print('done')
+
 
 def generate_board():
     global initial_board
@@ -92,28 +98,49 @@ def generate_board():
 
     for i in range(8):
         col = SQUARE_EDGE * i
-        exec('initial_board.paste({0}, (col, 0), {0})'.format(order[0] + row[i]))
-        exec('initial_board.paste({0}, (col, BOARD_EDGE - SQUARE_EDGE), {0})'.format(order[1] + row[i]))
+        exec('initial_board.paste({0}, (col, 0), {0})'
+            .format(order[0] + row[i]))
+        exec('initial_board.paste({0}, (col, BOARD_EDGE - SQUARE_EDGE), {0})'
+            .format(order[1] + row[i]))
 
-        exec('initial_board.paste({0}p, (col, SQUARE_EDGE), {0}p)'.format(order[0]))
-        exec('initial_board.paste({0}p, (col, BOARD_EDGE - (SQUARE_EDGE * 2)), {0}p)'.format(order[1]))
+        exec('initial_board.paste({0}p, (col, SQUARE_EDGE), {0}p)'
+            .format(order[0]))
+        exec(
+            'initial_board.paste({0}p, (col, BOARD_EDGE - (SQUARE_EDGE * 2)), {0}p)'
+            .format(order[1]))
+
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--path', help='Path to the pgn file/folder', default=os.getcwd() + '/')
-    parser.add_argument('-d', '--delay', help='Delay between moves in seconds', default=0.4)
-    parser.add_argument('-o', '--out', help='Name of the output folder', default=os.getcwd())
-    parser.add_argument('-r', '--reverse', help='Reverse board', action='store_true')
-    parser.add_argument('--black-square-color', help='Color of black squares in hex', default='#4B7399')
-    parser.add_argument('--white-square-color', help='Color of white squares in hex', default='#EAE9D2')
+    parser.add_argument(
+        '-p',
+        '--path',
+        help='Path to the pgn file/folder',
+        default=os.getcwd() + '/')
+    parser.add_argument(
+        '-d', '--delay', help='Delay between moves in seconds', default=0.4)
+    parser.add_argument(
+        '-o', '--out', help='Name of the output folder', default=os.getcwd())
+    parser.add_argument(
+        '-r', '--reverse', help='Reverse board', action='store_true')
+    parser.add_argument(
+        '--black-square-color',
+        help='Color of black squares in hex',
+        default='#4B7399')
+    parser.add_argument(
+        '--white-square-color',
+        help='Color of white squares in hex',
+        default='#EAE9D2')
     args = parser.parse_args()
 
     global reverse
     reverse = args.reverse
 
     global white_square, black_square
-    white_square = Image.new('RGBA', (SQUARE_EDGE, SQUARE_EDGE), args.white_square_color)
-    black_square = Image.new('RGBA', (SQUARE_EDGE, SQUARE_EDGE), args.black_square_color)
+    white_square = Image.new('RGBA', (SQUARE_EDGE, SQUARE_EDGE),
+                             args.white_square_color)
+    black_square = Image.new('RGBA', (SQUARE_EDGE, SQUARE_EDGE),
+                             args.black_square_color)
 
     generate_board()
 
@@ -123,6 +150,7 @@ def main():
     elif os.path.isdir(args.path):
         for pgn in glob.glob(args.path + '*.pgn'):
             process_file(pgn, args.delay, args.out)
+
 
 if __name__ == '__main__':
     main()
