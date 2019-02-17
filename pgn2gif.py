@@ -41,29 +41,28 @@ def clear(image, crd):
     else:
         image.paste(black_square, crd, black_square)
 
-def apply_move(current, previous):
+def apply_move(board_image, current, previous):
     changed = [s for s in current.keys() if current[s] != previous[s]]
 
     for square in changed:
         crd = coordinates_of_square(square)
-        clear(board, crd)
+        clear(board_image, crd)
 
         if current[square] != '':
-            exec('board.paste({0}, crd, {0})'.format(current[square]))
+            exec('board_image.paste({0}, crd, {0})'.format(current[square]))
 
 def create_gif(pgn, output_dir, out_name, duration):
-    global board
-    board = board_image.copy()
+    board_image = initial_board.copy()
+    images = [array(board_image)]
 
     game = chess.ChessGame()
-    images = [array(board)]
     moves = chess.get_moves_from_pgn(pgn)
 
     for move in moves:
         previous = game.state.copy()
         game.push(move)
-        apply_move(game.state, previous)
-        images.append(array(board))
+        apply_move(board_image, game.state, previous)
+        images.append(array(board_image))
 
     last = images[len(moves)]
     for i in range(3):
@@ -81,23 +80,23 @@ def process_file(pgn, duration, output_dir):
         print('done')
 
 def generate_board():
-    global board_image
-    board_image = Image.new('RGB', (BOARD_EDGE, BOARD_EDGE))
+    global initial_board
+    initial_board = Image.new('RGB', (BOARD_EDGE, BOARD_EDGE))
 
     for i in range(0, BOARD_EDGE, SQUARE_EDGE):
         for j in range(0, BOARD_EDGE, SQUARE_EDGE):
-            clear(board_image, (i, j))
+            clear(initial_board, (i, j))
 
     row = ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r']
     order = ('w', 'b') if reverse else ('b', 'w')
 
     for i in range(8):
         col = SQUARE_EDGE * i
-        exec('board_image.paste({0}, (col, 0), {0})'.format(order[0] + row[i]))
-        exec('board_image.paste({0}, (col, BOARD_EDGE - SQUARE_EDGE), {0})'.format(order[1] + row[i]))
+        exec('initial_board.paste({0}, (col, 0), {0})'.format(order[0] + row[i]))
+        exec('initial_board.paste({0}, (col, BOARD_EDGE - SQUARE_EDGE), {0})'.format(order[1] + row[i]))
 
-        exec('board_image.paste({0}p, (col, SQUARE_EDGE), {0}p)'.format(order[0]))
-        exec('board_image.paste({0}p, (col, BOARD_EDGE - (SQUARE_EDGE * 2)), {0}p)'.format(order[1]))
+        exec('initial_board.paste({0}p, (col, SQUARE_EDGE), {0}p)'.format(order[0]))
+        exec('initial_board.paste({0}p, (col, BOARD_EDGE - (SQUARE_EDGE * 2)), {0}p)'.format(order[1]))
 
 def main():
     parser = argparse.ArgumentParser()
