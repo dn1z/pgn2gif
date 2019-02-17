@@ -1,3 +1,4 @@
+import os
 
 try:
     from setuptools import setup
@@ -17,8 +18,9 @@ REQUIRED = [
     'numpy', 'imageio', 'pillow'
 ]
 
+here = os.path.dirname(__file__)
 try:
-    with open('./README.md') as f:
+    with open(os.path.join(here, 'README.md')) as f:
         LONG_DESCRIPTION = f.read()
 except:
     LONG_DESCRIPTION = DESCRIPTION
