@@ -72,7 +72,7 @@ def create_gif(pgn, output_dir, out_name, duration):
 
 def process_file(pgn, duration, output_dir):
     name = os.path.basename(pgn)[:-4] + '.gif'
-    if name in os.listdir('.'):
+    if name in os.listdir(output_dir):
         print('gif with name %s already exists.' % name)
     else:
         print('Creating ' + name, end='... ')
