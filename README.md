@@ -2,15 +2,19 @@
 Generate gifs from pgn files of your chess games.
 
 ## Installation
-* You need [python 3](https://www.python.org/downloads/) or newer installed.
+* You need [python 2.7](https://www.python.org/downloads/) or newer installed.
 * Clone the repo with `git clone https://github.com/dn1z/pgn2gif.git`.
-* In the cloned directory Run
+* In the cloned directory run
 ```
 pip install -r requirements.txt
 ```
+* If you want to install system wide
+```
+python setup.py install
+```
 
 ## Usage
-Run `python3 pgn2gif.py` with the following options:
+Run pgn2gif with the following options:
 ```
 Usage
     pgn2gif.py [-h] [-p PATH] [-d DELAY] [-o OUT] [-r]
