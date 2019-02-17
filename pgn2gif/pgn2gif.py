@@ -4,25 +4,31 @@ import os
 import glob
 import argparse
 
-import chess
-
 import imageio
 from PIL import Image
 from numpy import array
 
-bk = Image.open('./images/bk.png')
-bq = Image.open('./images/bq.png')
-bb = Image.open('./images/bb.png')
-bn = Image.open('./images/bn.png')
-br = Image.open('./images/br.png')
-bp = Image.open('./images/bp.png')
+from . import chess
 
-wk = Image.open('./images/wk.png')
-wq = Image.open('./images/wq.png')
-wb = Image.open('./images/wb.png')
-wn = Image.open('./images/wn.png')
-wr = Image.open('./images/wr.png')
-wp = Image.open('./images/wp.png')
+cwd = os.getcwd()
+os.chdir(os.path.dirname(__file__))
+
+# Lazily load images
+bk = Image.open('./assets/bk.png')
+bq = Image.open('./assets/bq.png')
+bb = Image.open('./assets/bb.png')
+bn = Image.open('./assets/bn.png')
+br = Image.open('./assets/br.png')
+bp = Image.open('./assets/bp.png')
+
+wk = Image.open('./assets/wk.png')
+wq = Image.open('./assets/wq.png')
+wb = Image.open('./assets/wb.png')
+wn = Image.open('./assets/wn.png')
+wr = Image.open('./assets/wr.png')
+wp = Image.open('./assets/wp.png')
+
+os.chdir(cwd)
 
 # You can change the size of gif (BOARD_EDGE x BOARD_EDGE)
 # But it is not recommended unless you update piece images to fit square
