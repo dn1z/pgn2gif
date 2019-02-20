@@ -17,9 +17,9 @@ python setup.py install
 Run pgn2gif with the following options:
 ```
 Usage
-    pgn2gif.py [-h] [-p PATH] [-d DELAY] [-o OUT] [-r]
-               [--black-square-color BLACK_SQUARE_COLOR]
-               [--white-square-color WHITE_SQUARE_COLOR]
+    pgn2gif [-h] [-p PATH] [-d DELAY] [-o OUT] [-r]
+            [--black-square-color BLACK_SQUARE_COLOR]
+            [--white-square-color WHITE_SQUARE_COLOR]
 
 Optional arguments
     -p, --path            Path to the pgn file/folder
