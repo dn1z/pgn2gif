@@ -7,7 +7,7 @@ except ImportError:
 
 
 NAME = 'pgn2gif'
-AUTHOR = 'Deniz Kızılırmak'
+AUTHOR = 'Deniz Kizilirmak'
 URL = 'https://github.com/dn1z/pgn2gif'
 DESCRIPTION = 'A small tool that generates gif of chess game'
 
@@ -40,7 +40,7 @@ setup(
         'pgn2gif': ['assets/*.png']
     },
     packages=['pgn2gif'],
-    install_reqiured=REQUIRED,
+    install_required=REQUIRED,
     python_requires=REQUIRES_PYTHON,
 
     entry_points={
