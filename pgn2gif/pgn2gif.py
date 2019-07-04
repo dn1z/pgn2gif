@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import os
+import sys
 import glob
 import argparse
 
@@ -8,10 +9,13 @@ import imageio
 from PIL import Image
 from numpy import array
 
-from . import chess
-
 cwd = os.getcwd()
-os.chdir(os.path.dirname(__file__))
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, script_dir + '/chess')
+
+import chess
+
+os.chdir(script_dir)
 
 # Lazily load images
 bk = Image.open('./assets/bk.png')
@@ -121,10 +125,7 @@ def generate_board():
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-p',
-        '--path',
-        help='Path to the pgn file/folder',
-        default=os.getcwd() + '/')
+        'path', nargs='*', help='Path to the pgn file/folder')
     parser.add_argument(
         '-d', '--delay', help='Delay between moves in seconds', default=0.4)
     parser.add_argument(
@@ -152,13 +153,16 @@ def main():
 
     generate_board()
 
-    if os.path.isfile(args.path):
-        process_file(args.path, args.delay, args.out)
+    if not args.path:
+        print('Please specify path or directory of pgn files')
 
-    elif os.path.isdir(args.path):
-        for pgn in glob.glob(args.path + '*.pgn'):
-            process_file(pgn, args.delay, args.out)
+    for path in args.path:
+        if os.path.isfile(path):
+            process_file(path, args.delay, args.out)
 
+        elif os.path.isdir(path):
+            for pgn in glob.glob(path + '/*.pgn'):
+                process_file(pgn, args.delay, args.out)
 
 if __name__ == '__main__':
     main()

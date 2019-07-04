@@ -5,7 +5,6 @@ try:
 except ImportError:
     from distutils.core import setup
 
-
 NAME = 'pgn2gif'
 AUTHOR = 'Deniz Kizilirmak'
 URL = 'https://github.com/dn1z/pgn2gif'
@@ -39,10 +38,9 @@ setup(
     package_data = {
         'pgn2gif': ['assets/*.png']
     },
-    packages=['pgn2gif'],
+    packages=['pgn2gif', 'pgn2gif.chess'],
     install_required=REQUIRED,
     python_requires=REQUIRES_PYTHON,
-
     entry_points={
         'console_scripts': ['pgn2gif = pgn2gif:main']
     },
