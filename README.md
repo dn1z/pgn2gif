@@ -16,25 +16,25 @@ python setup.py install
 ## Usage
 Run pgn2gif with the following options:
 ```
-Usage
-    pgn2gif [-h] [-p PATH] [-d DELAY] [-o OUT] [-r]
-            [--black-square-color BLACK_SQUARE_COLOR]
-            [--white-square-color WHITE_SQUARE_COLOR]
+usage: pgn2gif.py [-h] [-d DELAY] [-o OUT] [-r]
+                  [--black-square-color BLACK_SQUARE_COLOR]
+                  [--white-square-color WHITE_SQUARE_COLOR]
+                  [path [path ...]]
 
-Optional arguments
-    -p, --path            Path to the pgn file/folder
-    -d, --delay           Delay between moves in seconds
-    -o, --out             Name of the output folder
-    -r, --reverse         Reverse board
-    --black-square-color  Color of black squares in hex
-    --white-square-color  Color of white squares in hex
+positional arguments:
+  path                  Path to the pgn file/folder
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d DELAY, --delay DELAY
+                        Delay between moves in seconds
+  -o OUT, --out OUT     Name of the output folder
+  -r, --reverse         Reverse board
+  --black-square-color BLACK_SQUARE_COLOR
+                        Color of black squares in hex
+  --white-square-color WHITE_SQUARE_COLOR
+                        Color of white squares in hex
 ```
-
-__NOTE__
-
-If you choose to run pgn2gif without any other option then:
-
-* pgn file must be present within the current working directory
 
 ## Example
 
