@@ -13,9 +13,7 @@ DESCRIPTION = 'A small tool that generates gif of chess game'
 VERSION = '1.0'
 
 REQUIRES_PYTHON = '>=2.7.0'
-REQUIRED = [
-    'numpy', 'imageio', 'pillow'
-]
+REQUIRED = ['numpy', 'imageio', 'pillow']
 
 here = os.path.dirname(__file__)
 try:
@@ -33,13 +31,12 @@ setup(
     version=VERSION,
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
-    long_description_content_type='text/markdown',
 
     package_data = {
         'pgn2gif': ['assets/*.png']
     },
     packages=['pgn2gif', 'pgn2gif.chess'],
-    install_required=REQUIRED,
+    install_requires=REQUIRED,
     python_requires=REQUIRES_PYTHON,
     entry_points={
         'console_scripts': ['pgn2gif = pgn2gif:main']
