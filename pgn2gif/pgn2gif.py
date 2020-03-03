@@ -142,6 +142,9 @@ def main():
         default='#EAE9D2')
     args = parser.parse_args()
 
+    if not args.path:
+        print('Please specify path or directory of pgn files')
+
     global reverse
     reverse = args.reverse
 
@@ -152,9 +155,6 @@ def main():
                              args.black_square_color)
 
     generate_board()
-
-    if not args.path:
-        print('Please specify path or directory of pgn files')
 
     for path in args.path:
         if os.path.isfile(path):
