@@ -25,17 +25,15 @@ except:
 setup(
     name=NAME,
     author=AUTHOR,
-
     url=URL,
     license='MIT',
     version=VERSION,
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
-
-    package_data = {
+    package_data={
         'pgn2gif': ['assets/*.png']
     },
-    packages=['pgn2gif', 'pgn2gif.chess'],
+    packages=['pgn2gif'],
     install_requires=REQUIRED,
     python_requires=REQUIRES_PYTHON,
     entry_points={

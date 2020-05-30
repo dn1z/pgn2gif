@@ -1,7 +1,11 @@
 from __future__ import print_function
 
+try:
+    from . import chess
+except ImportError:
+    import chess
+
 import os
-import sys
 import glob
 import argparse
 
@@ -11,10 +15,6 @@ from numpy import array
 
 cwd = os.getcwd()
 script_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, script_dir + '/chess')
-
-import chess
-
 os.chdir(script_dir)
 
 # Lazily load images
@@ -163,6 +163,7 @@ def main():
         elif os.path.isdir(path):
             for pgn in glob.glob(path + '/*.pgn'):
                 process_file(pgn, args.delay, args.out)
+
 
 if __name__ == '__main__':
     main()
