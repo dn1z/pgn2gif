@@ -35,7 +35,7 @@ wp = Image.open('./assets/wp.png')
 os.chdir(cwd)
 
 # You can change the size of gif (BOARD_EDGE x BOARD_EDGE)
-# But it is not recommended unless you update piece images to fit square
+# But it is not recommended unless you update piece images to fit squares
 BOARD_EDGE = 480
 SQUARE_EDGE = BOARD_EDGE // 8
 
@@ -67,7 +67,7 @@ def apply_move(board_image, current, previous):
             exec('board_image.paste({0}, crd, {0})'.format(current[square]))
 
 
-def create_gif(pgn, output_dir, out_name, duration):
+def create_gif(pgn, gif_path, duration):
     board_image = initial_board.copy()
     images = [array(board_image)]
 
@@ -84,7 +84,7 @@ def create_gif(pgn, output_dir, out_name, duration):
     for i in range(3):
         images.append(last)
 
-    imageio.mimsave(output_dir + '/' + out_name, images, duration=duration)
+    imageio.mimsave(gif_path, images, duration=duration)
 
 
 def process_file(pgn, duration, output_dir):
@@ -92,8 +92,9 @@ def process_file(pgn, duration, output_dir):
     if name in os.listdir(output_dir):
         print('gif with name %s already exists.' % name)
     else:
+        gif_path = output_dir + '/' + name
         print('Creating ' + name, end='... ')
-        create_gif(pgn, output_dir, name, duration)
+        create_gif(pgn, gif_path, duration)
         print('done')
 
 
