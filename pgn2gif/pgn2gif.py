@@ -45,26 +45,6 @@ def update_board_image(board_image, game_state, changed_squares):
                 board_image, piece, coordinates_of_square(square))
 
 
-def create_gif(pgn, gif_path, duration):
-    board_image = initial_board.copy()
-    images = [array(board_image)]
-
-    game = chess.ChessGame(pgn=pgn)
-
-    while not game.is_finished:
-        previous = game.state.copy()
-        game.next()
-        update_board_image(board_image, game.state, [
-                           s for s in game.state.keys() if game.state[s] != previous[s]])
-        images.append(array(board_image))
-
-    last = images[len(images) - 1]
-    for _ in range(3):
-        images.append(last)
-
-    imageio.mimsave(gif_path, images, duration=duration)
-
-
 def paste_image_into_square(image, piece, crd):
     exec('image.paste({0}, {1}, {0})'.format(piece, crd))
 
@@ -98,6 +78,26 @@ def generate_board():
     initial_board = Image.new('RGB', (BOARD_EDGE, BOARD_EDGE))
     update_board_image(initial_board, chess.INITIAL_STATE,
                        list(chess.INITIAL_STATE.keys()))
+
+
+def create_gif(pgn, gif_path, duration):
+    board_image = initial_board.copy()
+    images = [array(board_image)]
+
+    game = chess.ChessGame(pgn=pgn)
+
+    while not game.is_finished:
+        previous = game.state.copy()
+        game.next()
+        update_board_image(board_image, game.state, [
+                           s for s in game.state.keys() if game.state[s] != previous[s]])
+        images.append(array(board_image))
+
+    last = images[len(images) - 1]
+    for _ in range(3):
+        images.append(last)
+
+    imageio.mimsave(gif_path, images, duration=duration)
 
 
 def main():
