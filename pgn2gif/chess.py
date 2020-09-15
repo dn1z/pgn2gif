@@ -1,77 +1,84 @@
 import re
 
+INITIAL_STATE = {
+    'a8': 'br',
+    'b8': 'bn',
+    'c8': 'bb',
+    'd8': 'bq',
+    'e8': 'bk',
+    'f8': 'bb',
+    'g8': 'bn',
+    'h8': 'br',
+    'a7': 'bp',
+    'b7': 'bp',
+    'c7': 'bp',
+    'd7': 'bp',
+    'e7': 'bp',
+    'f7': 'bp',
+    'g7': 'bp',
+    'h7': 'bp',
+    'a6': '',
+    'b6': '',
+    'c6': '',
+    'd6': '',
+    'e6': '',
+    'f6': '',
+    'g6': '',
+    'h6': '',
+    'a5': '',
+    'b5': '',
+    'c5': '',
+    'd5': '',
+    'e5': '',
+    'f5': '',
+    'g5': '',
+    'h5': '',
+    'a4': '',
+    'b4': '',
+    'c4': '',
+    'd4': '',
+    'e4': '',
+    'f4': '',
+    'g4': '',
+    'h4': '',
+    'a3': '',
+    'b3': '',
+    'c3': '',
+    'd3': '',
+    'e3': '',
+    'f3': '',
+    'g3': '',
+    'h3': '',
+    'a2': 'wp',
+    'b2': 'wp',
+    'c2': 'wp',
+    'd2': 'wp',
+    'e2': 'wp',
+    'f2': 'wp',
+    'g2': 'wp',
+    'h2': 'wp',
+    'a1': 'wr',
+    'b1': 'wn',
+    'c1': 'wb',
+    'd1': 'wq',
+    'e1': 'wk',
+    'f1': 'wb',
+    'g1': 'wn',
+    'h1': 'wr'
+}
+
 COLUMNS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
 
-class ChessGame(object):
-    def __init__(self):
+class ChessGame:
+    def __init__(self, pgn):
+        self.is_finished = False
         self.is_white_turn = True
-        self.state = {
-            'a8': 'br',
-            'b8': 'bn',
-            'c8': 'bb',
-            'd8': 'bq',
-            'e8': 'bk',
-            'f8': 'bb',
-            'g8': 'bn',
-            'h8': 'br',
-            'a7': 'bp',
-            'b7': 'bp',
-            'c7': 'bp',
-            'd7': 'bp',
-            'e7': 'bp',
-            'f7': 'bp',
-            'g7': 'bp',
-            'h7': 'bp',
-            'a6': '',
-            'b6': '',
-            'c6': '',
-            'd6': '',
-            'e6': '',
-            'f6': '',
-            'g6': '',
-            'h6': '',
-            'a5': '',
-            'b5': '',
-            'c5': '',
-            'd5': '',
-            'e5': '',
-            'f5': '',
-            'g5': '',
-            'h5': '',
-            'a4': '',
-            'b4': '',
-            'c4': '',
-            'd4': '',
-            'e4': '',
-            'f4': '',
-            'g4': '',
-            'h4': '',
-            'a3': '',
-            'b3': '',
-            'c3': '',
-            'd3': '',
-            'e3': '',
-            'f3': '',
-            'g3': '',
-            'h3': '',
-            'a2': 'wp',
-            'b2': 'wp',
-            'c2': 'wp',
-            'd2': 'wp',
-            'e2': 'wp',
-            'f2': 'wp',
-            'g2': 'wp',
-            'h2': 'wp',
-            'a1': 'wr',
-            'b1': 'wn',
-            'c1': 'wb',
-            'd1': 'wq',
-            'e1': 'wk',
-            'f1': 'wb',
-            'g1': 'wn',
-            'h1': 'wr'
-        }
+        self.__last_played_move_index = -1
+
+        self.moves = self.__parse_pgn_file(pgn)
+
+        self.state = INITIAL_STATE.copy()
 
     def __check_knight_move(self, sqr1, sqr2):
         cd = abs(ord(sqr1[0]) - ord(sqr2[0]))
@@ -186,7 +193,26 @@ class ChessGame(object):
         origin = move[0] + ('7' if self.is_white_turn else '2')
         self.__update_state(origin, move[-4:-2], pt)
 
-    def push(self, move):
+    def __parse_pgn_file(self, pgn):
+        with open(pgn) as p:
+            data = p.read()
+            data = re.sub(r'\{.*?\}', '', data)  # Removes pgn comments
+            moves = re.findall(
+                r'[a-h]x?[a-h]?[1-8]=?[BKNRQ]?|O-O-?O?|[BKNRQ][a-h1-8]?[a-h1-8]?x?[a-h][1-8]',
+                data)
+            return [move.replace('x', '') for move in moves]
+
+    def next(self):
+        if self.is_finished:
+            return
+
+        self.__last_played_move_index += 1
+        try:
+            move = self.moves[self.__last_played_move_index]
+        except:
+            self.is_finished = True
+            return
+
         if 'O' in move:
             self.__castle(move)
 
@@ -205,13 +231,3 @@ class ChessGame(object):
             self.__update_state(origin, dest, pt)
 
         self.is_white_turn = not self.is_white_turn
-
-
-def get_moves_from_pgn(pgn):
-    with open(pgn) as p:
-        data = p.read()
-        data = re.sub(r'\{.*?\}', '', data)  # Removes pgn comments
-        moves = re.findall(
-            r'[a-h]x?[a-h]?[1-8]=?[BKNRQ]?|O-O-?O?|[BKNRQ][a-h1-8]?[a-h1-8]?x?[a-h][1-8]',
-            data)
-        return [move.replace('x', '') for move in moves]
