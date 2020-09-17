@@ -196,11 +196,11 @@ class ChessGame:
     def __parse_pgn_file(self, pgn):
         with open(pgn) as p:
             data = p.read()
-            data = re.sub(r'\{.*?\}', '', data)  # Removes pgn comments
+            data = re.sub(r'\{.*?\}|\[.*?\]|[x]', '', data)
             moves = re.findall(
                 r'[a-h]x?[a-h]?[1-8]=?[BKNRQ]?|O-O-?O?|[BKNRQ][a-h1-8]?[a-h1-8]?x?[a-h][1-8]',
                 data)
-            return [move.replace('x', '') for move in moves]
+            return moves
 
     def next(self):
         if self.is_finished:
