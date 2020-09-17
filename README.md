@@ -22,7 +22,7 @@ usage: pgn2gif.py [-h] [-d DELAY] [-o OUT] [-r]
                   [path [path ...]]
 
 positional arguments:
-  path                  Path to the pgn file/folder
+  path                  Path to the pgn file(s)
 
 optional arguments:
   -h, --help            show this help message and exit
