@@ -10,10 +10,10 @@ AUTHOR = 'Deniz Kizilirmak'
 URL = 'https://github.com/dn1z/pgn2gif'
 DESCRIPTION = 'A small tool that generates gif of chess game'
 
-VERSION = '1.1'
+VERSION = '1.2'
 
 REQUIRES_PYTHON = '>=3.5'
-REQUIRED = ['numpy', 'imageio', 'pillow']
+REQUIRED = ['pillow']
 
 here = os.path.dirname(__file__)
 try:

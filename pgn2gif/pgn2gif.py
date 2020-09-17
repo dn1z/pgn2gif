@@ -6,10 +6,7 @@ except ImportError:
 import os
 import argparse
 
-import imageio
 from PIL import Image
-from numpy import array
-
 
 # You can change the size of gif (BOARD_EDGE x BOARD_EDGE)
 # But it is not recommended unless piece images are updated to fit into squares
@@ -75,29 +72,30 @@ def load_assets():
 
 def generate_board():
     global initial_board
-    initial_board = Image.new('RGB', (BOARD_EDGE, BOARD_EDGE))
+    initial_board = Image.new('RGBA', (BOARD_EDGE, BOARD_EDGE))
     update_board_image(initial_board, chess.INITIAL_STATE,
                        list(chess.INITIAL_STATE.keys()))
 
 
 def create_gif(pgn, gif_path, duration):
     board_image = initial_board.copy()
-    images = [array(board_image)]
+    frames = [board_image.copy()]
 
-    game = chess.ChessGame(pgn=pgn)
+    game = chess.ChessGame(pgn)
 
     while not game.is_finished:
         previous = game.state.copy()
         game.next()
         update_board_image(board_image, game.state, [
                            s for s in game.state.keys() if game.state[s] != previous[s]])
-        images.append(array(board_image))
+        frames.append(board_image.copy())
 
-    last = images[len(images) - 1]
+    last = frames[len(frames) - 1]
     for _ in range(3):
-        images.append(last)
+        frames.append(last)
 
-    imageio.mimsave(gif_path, images, duration=duration)
+    frames[0].save(gif_path, format="GIF", append_images=frames[1:],
+                   optimize=True, save_all=True, duration=int(float(duration) * 1000), loop=0)
 
 
 def main():
@@ -113,11 +111,11 @@ def main():
     parser.add_argument(
         '--black-square-color',
         help='Color of black squares in hex',
-        default='#4B7399')
+        default='#b58863')
     parser.add_argument(
         '--white-square-color',
         help='Color of white squares in hex',
-        default='#EAE9D2')
+        default='#f0d9b5')
     args = parser.parse_args()
 
     if not args.path:
