@@ -55,4 +55,4 @@ Nd7 37. Rd1 Nc5 38. Rxd8 Nxe6 39. Rxa8 Kf6 40. cxb5 cxb5
 ```
 
 ### GIF output
-<img src="https://thumbs.gfycat.com/HarmfulEveryGreyhounddog-size_restricted.gif">
+<img src="https://thumbs.gfycat.com/LeadingVibrantGoat-mobile.mp4">
