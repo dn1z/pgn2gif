@@ -72,12 +72,12 @@ COLUMNS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
 class ChessGame:
     def __init__(self, pgn):
+        self.moves = []
         self.is_finished = False
         self.is_white_turn = True
         self.__last_played_move_index = -1
 
-        self.moves = self.__parse_pgn_file(pgn)
-
+        self.__parse_pgn_file(pgn)
         self.state = INITIAL_STATE.copy()
 
     def __check_knight_move(self, sqr1, sqr2):
@@ -197,10 +197,9 @@ class ChessGame:
         with open(pgn) as p:
             data = p.read()
             data = re.sub(r'\{.*?\}|\[.*?\]|[x]', '', data)
-            moves = re.findall(
+            self.moves = re.findall(
                 r'[a-h]x?[a-h]?[1-8]=?[BKNRQ]?|O-O-?O?|[BKNRQ][a-h1-8]?[a-h1-8]?x?[a-h][1-8]',
                 data)
-            return moves
 
     def next(self):
         if self.is_finished:
