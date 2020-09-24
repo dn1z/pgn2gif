@@ -123,7 +123,7 @@ class PgnToGifCreator:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        'path', nargs='*', help='Path to the pgn file')
+        'path', nargs='*', help='Path to the pgn file(s)')
     parser.add_argument(
         '-d', '--duration', help='Duration between moves in seconds', default=0.4)
     parser.add_argument(
@@ -132,11 +132,11 @@ def main():
         '-r', '--reverse', help='Reverse board', action='store_true')
     parser.add_argument(
         '--black-square-color',
-        help='Color of black squares in hex',
+        help='Color of black squares in hex or string',
         default='#b58863')
     parser.add_argument(
         '--white-square-color',
-        help='Color of white squares in hex',
+        help='Color of white squares in hex or string',
         default='#f0d9b5')
     args = parser.parse_args()
 
