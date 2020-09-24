@@ -3,7 +3,7 @@ Generate gifs from pgn files of your chess games.
 
 ## Installation
 * You need [python 3.5](https://www.python.org/downloads/) or newer installed.
-* Clone the repo with `git clone https://github.com/dn1z/pgn2gif.git`.
+* Clone the repo with `git clone https://github.com/dn1z/pgn2gif`.
 * In the cloned directory run
 ```
 pip install -r requirements.txt
@@ -16,24 +16,29 @@ python setup.py install
 ## Usage
 Run pgn2gif with the following options:
 ```
-usage: pgn2gif.py [-h] [-d DELAY] [-o OUT] [-r]
-                  [--black-square-color BLACK_SQUARE_COLOR]
-                  [--white-square-color WHITE_SQUARE_COLOR]
-                  [path [path ...]]
+usage: pgn2gif [-h] [-d DURATION] [-o OUT] [-r] [--black-square-color BLACK_SQUARE_COLOR] [--white-square-color WHITE_SQUARE_COLOR] [path [path ...]]
 
 positional arguments:
   path                  Path to the pgn file(s)
 
 optional arguments:
   -h, --help            show this help message and exit
-  -d DELAY, --delay DELAY
-                        Delay between moves in seconds
+  -d DURATION, --duration DURATION
+                        Duration between moves in seconds
   -o OUT, --out OUT     Name of the output folder
   -r, --reverse         Reverse board
   --black-square-color BLACK_SQUARE_COLOR
                         Color of black squares in hex
   --white-square-color WHITE_SQUARE_COLOR
                         Color of white squares in hex
+```
+Also can be used as a library
+```python
+import pgn2gif
+
+creator = pgn2gif.PgnToGifCreator(reverse=True, duration=0.1, white_square_color='white', black_square_color='gray')
+creator.create_gif("first.pgn") # creates first.gif
+creator.create_gif("second.pgn", out_path="../chess.gif")
 ```
 
 ## Example
