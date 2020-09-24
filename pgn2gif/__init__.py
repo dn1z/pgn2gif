@@ -1,1 +1,1 @@
-from .pgn2gif import main
+from .pgn2gif import main, PgnToGifCreator
