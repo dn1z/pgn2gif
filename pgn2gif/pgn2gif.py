@@ -3,7 +3,6 @@ try:
 except ImportError:
     import chess
 
-import os
 import argparse
 from pathlib import Path
 
@@ -19,72 +18,90 @@ class PgnToGifCreator:
         Whether to reverse board or not
     duration : float, optional
         Duration between moves in seconds
-    white_square_color : str, optional
+    ws_color : str, optional
         Color of white squares in hex or string
-    black_square_color : str, optional
+    bs_color : str, optional
         Color of black squares in hex or string
     '''
 
-    __BOARD_SIZE = 480
-    __SQ_SIZE = __BOARD_SIZE // 8
+    _BOARD_SIZE = 480
+    _SQ_SIZE = _BOARD_SIZE // 8
 
-    def __init__(self, reverse=False, duration=0.4, white_square_color='#f0d9b5', black_square_color='#b58863'):
-        self.__pieces = {}
-        self.__reverse = reverse
-        self.__duration = duration
+    def __init__(self, reverse=False, duration=0.4, ws_color='#f0d9b5', bs_color='#b58863'):
+        self.duration = duration
 
-        self.__load_pieces()
-        self.__generate_board(white_square_color, black_square_color)
+        self._pieces = {}
+        self._reverse = reverse
+        self._ws_color = ws_color
+        self._bs_color = bs_color
+        self._should_redraw = True
 
-    def __generate_board(self, white_square_color, black_square_color):
-        self.__white_square = Image.new('RGBA', (self.__SQ_SIZE, self.__SQ_SIZE),
-                                        white_square_color)
-        self.__black_square = Image.new('RGBA', (self.__SQ_SIZE, self.__SQ_SIZE),
-                                        black_square_color)
+    @property
+    def reverse(self):
+        return self._reverse
 
-        self.__initial_board = Image.new(
-            'RGBA', (self.__BOARD_SIZE, self.__BOARD_SIZE))
-        self.__update_board_image(self.__initial_board, chess.INITIAL_STATE,
-                                  list(chess.INITIAL_STATE.keys()))
+    @reverse.setter
+    def reverse(self, reverse):
+        self._reverse = reverse
+        self._should_redraw = True
 
-    def __load_pieces(self):
-        cwd = os.getcwd()
-        assets_dir = os.path.join(os.path.dirname(
-            os.path.abspath(__file__)), 'assets')
-        os.chdir(assets_dir)
+    @property
+    def ws_color(self):
+        return self._ws_color
 
-        for asset in os.listdir(assets_dir):
-            self.__pieces[os.path.splitext(asset)[0]] = Image.open(asset)
+    @ws_color.setter
+    def ws_color(self, ws_color):
+        self._ws_color = ws_color
+        self._should_redraw = True
 
-        os.chdir(cwd)
+    @property
+    def bs_color(self):
+        return self._bs_color
 
-    def __paste_image_into_board(self, board_image, pasted_image, coordinates):
-        board_image.paste(pasted_image, coordinates, pasted_image)
+    @bs_color.setter
+    def bs_color(self, bs_color):
+        self._bs_color = bs_color
+        self._should_redraw = True
 
-    def __update_board_image(self, board_image, game_state, changed_squares):
-        for square in changed_squares:
-            crd = self.__coordinates_of_square(square)
+    def _draw_board(self):
+        if not self._pieces:
+            for asset in (Path(__file__).parent/'assets').iterdir():
+                self._pieces[asset.stem] = Image.open(asset)
 
-            if sum(crd) % (self.__SQ_SIZE * 2) == 0:
-                self.__paste_image_into_board(
-                    board_image, self.__white_square, crd)
-            else:
-                self.__paste_image_into_board(
-                    board_image, self.__black_square, crd)
+        self._ws = Image.new('RGBA', (self._SQ_SIZE, self._SQ_SIZE),
+                             self.ws_color)
+        self._bs = Image.new('RGBA', (self._SQ_SIZE, self._SQ_SIZE),
+                             self.bs_color)
 
-            piece = game_state[square]
-            if piece:
-                self.__paste_image_into_board(
-                    board_image, self.__pieces[piece], crd)
+        self._initial_board = Image.new(
+            'RGBA', (self._BOARD_SIZE, self._BOARD_SIZE))
+        self._update_board_image(self._initial_board, chess.INITIAL_STATE,
+                                 list(chess.INITIAL_STATE.keys()))
 
-    def __coordinates_of_square(self, square):
+        self._should_redraw = False
+
+    def _coordinates_of_square(self, square):
         c = ord(square[0]) - 97
         r = int(square[1]) - 1
 
-        if self.__reverse:
-            return ((7 - c) * self.__SQ_SIZE, r * self.__SQ_SIZE)
+        if self.reverse:
+            return ((7 - c) * self._SQ_SIZE, r * self._SQ_SIZE)
         else:
-            return (c * self.__SQ_SIZE, (7 - r) * self.__SQ_SIZE)
+            return (c * self._SQ_SIZE, (7 - r) * self._SQ_SIZE)
+
+    def _update_board_image(self, board_image, game_state, changed_squares):
+        for square in changed_squares:
+            crd = self._coordinates_of_square(square)
+
+            if sum(crd) % (self._SQ_SIZE * 2) == 0:
+                board_image.paste(self._ws, crd, self._ws)
+            else:
+                board_image.paste(self._bs, crd, self._bs)
+
+            piece = game_state[square]
+            if piece:
+                img = self._pieces[piece]
+                board_image.paste(img, crd, img)
 
     def create_gif(self, pgn, out_path=None):
         '''
@@ -97,7 +114,10 @@ class PgnToGifCreator:
         out_path : str, optional
             Output path of gif
         '''
-        board_image = self.__initial_board.copy()
+        if self._should_redraw:
+            self._draw_board()
+
+        board_image = self._initial_board.copy()
         frames = [board_image.copy()]
 
         game = chess.ChessGame(pgn)
@@ -105,7 +125,7 @@ class PgnToGifCreator:
         while not game.is_finished:
             previous = game.state.copy()
             game.next()
-            self.__update_board_image(board_image, game.state, [
+            self._update_board_image(board_image, game.state, [
                 s for s in game.state.keys() if game.state[s] != previous[s]])
             frames.append(board_image.copy())
 
@@ -114,20 +134,20 @@ class PgnToGifCreator:
             frames.append(last)
 
         if not out_path:
-            out_path = os.path.join(os.getcwd(), Path(pgn).stem + '.gif')
+            out_path = Path(pgn).stem + '.gif'
 
         frames[0].save(out_path, format="GIF", append_images=frames[1:],
-                       optimize=True, save_all=True, duration=int(self.__duration * 1000), loop=0)
+                       optimize=True, save_all=True, duration=int(self.duration * 1000), loop=0)
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        'path', nargs='*', help='Path to the pgn file(s)')
+        'path', nargs='+', help='Path to the pgn file(s)')
     parser.add_argument(
         '-d', '--duration', help='Duration between moves in seconds', default=0.4)
     parser.add_argument(
-        '-o', '--out', help='Name of the output folder', default=os.getcwd())
+        '-o', '--out', help='Name of the output folder', default=Path.cwd())
     parser.add_argument(
         '-r', '--reverse', help='Reverse board', action='store_true')
     parser.add_argument(
@@ -140,15 +160,11 @@ def main():
         default='#f0d9b5')
     args = parser.parse_args()
 
-    if not args.path:
-        return
-
     creator = PgnToGifCreator(
         args.reverse, float(args.duration), args.white_square_color, args.black_square_color)
     for pgn in args.path:
         f = Path(pgn).stem + '.gif'
-        out_path = os.path.join(args.out, f)
-        creator.create_gif(pgn, out_path)
+        creator.create_gif(pgn, Path(args.out) / f)
 
 
 if __name__ == '__main__':
