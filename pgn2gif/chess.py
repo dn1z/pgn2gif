@@ -75,17 +75,17 @@ class ChessGame:
         self.moves = []
         self.is_finished = False
         self.is_white_turn = True
-        self.__last_played_move_index = -1
+        self._last_played_move_index = -1
 
-        self.__parse_pgn_file(pgn)
+        self._parse_pgn_file(pgn)
         self.state = INITIAL_STATE.copy()
 
-    def __check_knight_move(self, sqr1, sqr2):
+    def _check_knight_move(self, sqr1, sqr2):
         cd = abs(ord(sqr1[0]) - ord(sqr2[0]))
         rd = abs(int(sqr1[1]) - int(sqr2[1]))
         return (cd == 2 and rd == 1) or (cd == 1 and rd == 2)
 
-    def __check_line(self, sqr1, sqr2):
+    def _check_line(self, sqr1, sqr2):
         c1 = sqr1[0]
         c2 = sqr2[0]
         r1 = int(sqr1[1])
@@ -99,7 +99,7 @@ class ChessGame:
                        for i in range(min(r1, r2) + 1, max(r1, r2)))
         return False
 
-    def __check_diagonal(self, sqr1, sqr2):
+    def _check_diagonal(self, sqr1, sqr2):
         c1 = ord(sqr1[0]) - 97
         c2 = ord(sqr2[0]) - 97
         r1 = int(sqr1[1])
@@ -121,11 +121,11 @@ class ChessGame:
 
         return False
 
-    def __update_state(self, frm, to, pt):
+    def _update_state(self, frm, to, pt):
         self.state[frm] = ''
         self.state[to] = pt
 
-    def __find_non_pawn(self, move, to, piece):
+    def _find_non_pawn(self, move, to, piece):
         if len(move) == 5:
             return move[1:3]
 
@@ -135,21 +135,21 @@ class ChessGame:
         if p == 'r':
             return next(
                 s for s, pt in self.state.items()
-                if pt == piece and key in s and self.__check_line(s, to))
+                if pt == piece and key in s and self._check_line(s, to))
         elif p == 'b':
             return next(
                 s for s, pt in self.state.items()
-                if pt == piece and key in s and self.__check_diagonal(s, to))
+                if pt == piece and key in s and self._check_diagonal(s, to))
         elif p == 'n':
             return next(s for s, pt in self.state.items() if pt == piece
-                        and key in s and self.__check_knight_move(s, to))
+                        and key in s and self._check_knight_move(s, to))
         else:
             return next(
                 s for s, pt in self.state.items()
                 if pt == piece and key in s and (
-                    self.__check_line(s, to) or self.__check_diagonal(s, to)))
+                    self._check_line(s, to) or self._check_diagonal(s, to)))
 
-    def __find_pawn(self, move):
+    def _find_pawn(self, move):
         pt = 'wp' if self.is_white_turn else 'bp'
         c = move[-2]
         r = int(move[-1])
@@ -174,7 +174,7 @@ class ChessGame:
 
         return origin
 
-    def __castle(self, move):
+    def _castle(self, move):
         row, color = ('1', 'w') if self.is_white_turn else ('8', 'b')
         if move.count('O') == 2:
             r = 'h' + row
@@ -185,48 +185,48 @@ class ChessGame:
             k_to = 'c' + row
             r_to = 'd' + row
 
-        self.__update_state('e' + row, k_to, color + 'k')
-        self.__update_state(r, r_to, color + 'r')
+        self._update_state('e' + row, k_to, color + 'k')
+        self._update_state(r, r_to, color + 'r')
 
-    def __promote(self, move):
+    def _promote(self, move):
         pt = ('w' if self.is_white_turn else 'b') + move[-1].lower()
         origin = move[0] + ('7' if self.is_white_turn else '2')
-        self.__update_state(origin, move[-4:-2], pt)
+        self._update_state(origin, move[-4:-2], pt)
 
-    def __parse_pgn_file(self, pgn):
+    def _parse_pgn_file(self, pgn):
         with open(pgn) as p:
             data = p.read()
-            data = re.sub(r'\{.*?\}|\[.*?\]|[x]', '', data)
+            data = re.sub(r'{.*?}|\[.*?\]|[x]', '', data, flags=re.DOTALL)
             self.moves = re.findall(
-                r'[a-h]x?[a-h]?[1-8]=?[BKNRQ]?|O-O-?O?|[BKNRQ][a-h1-8]?[a-h1-8]?x?[a-h][1-8]',
+                r'[a-h][a-h]?[1-8]=?[BKNRQ]?|O-O-?O?|[BKNRQ][a-h1-8]?[a-h1-8]?[a-h][1-8]',
                 data)
 
     def next(self):
         if self.is_finished:
             return
 
-        self.__last_played_move_index += 1
+        self._last_played_move_index += 1
         try:
-            move = self.moves[self.__last_played_move_index]
+            move = self.moves[self._last_played_move_index]
         except:
             self.is_finished = True
             return
 
         if 'O' in move:
-            self.__castle(move)
+            self._castle(move)
 
         elif '=' in move:
-            self.__promote(move)
+            self._promote(move)
 
         else:
             dest = move[-2:]
             if (move.islower()):
                 pt = ('w' if self.is_white_turn else 'b') + 'p'
-                origin = self.__find_pawn(move)
+                origin = self._find_pawn(move)
             else:
                 pt = ('w' if self.is_white_turn else 'b') + move[0].lower()
-                origin = self.__find_non_pawn(move, dest, pt)
+                origin = self._find_non_pawn(move, dest, pt)
 
-            self.__update_state(origin, dest, pt)
+            self._update_state(origin, dest, pt)
 
         self.is_white_turn = not self.is_white_turn
