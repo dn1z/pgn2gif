@@ -27,16 +27,16 @@ optional arguments:
                         Duration between moves in seconds
   -o OUT, --out OUT     Name of the output folder
   -r, --reverse         Reverse board
-  --black-square-color BLACK_SQUARE_COLOR
+  --bs-color BLACK_SQUARE_COLOR
                         Color of black squares in hex
-  --white-square-color WHITE_SQUARE_COLOR
+  --ws-color WHITE_SQUARE_COLOR
                         Color of white squares in hex
 ```
 Also can be used as a library
 ```python
 import pgn2gif
 
-creator = pgn2gif.PgnToGifCreator(reverse=True, duration=0.1, white_square_color='white', black_square_color='gray')
+creator = pgn2gif.PgnToGifCreator(reverse=True, duration=0.1, ws_color='white', bs_color='gray')
 creator.create_gif("first.pgn") # creates first.gif
 creator.create_gif("second.pgn", out_path="../chess.gif")
 ```
