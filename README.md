@@ -36,7 +36,7 @@ Also can be used as a library
 ```python
 import pgn2gif
 
-creator = pgn2gif.PgnToGifCreator(reverse=True, duration=0.1, white_square_color='white', black_square_color='gray')
+creator = pgn2gif.PgnToGifCreator(reverse=True, duration=0.1, ws_color='white', bs_color='gray')
 creator.create_gif("first.pgn") # creates first.gif
 creator.create_gif("second.pgn", out_path="../chess.gif")
 ```
