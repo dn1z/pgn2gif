@@ -27,9 +27,9 @@ optional arguments:
                         Duration between moves in seconds
   -o OUT, --out OUT     Name of the output folder
   -r, --reverse         Reverse board
-  --bs-color BLACK_SQUARE_COLOR
+  --black-square-color BLACK_SQUARE_COLOR
                         Color of black squares in hex
-  --ws-color WHITE_SQUARE_COLOR
+  --white-square-color WHITE_SQUARE_COLOR
                         Color of white squares in hex
 ```
 Also can be used as a library
